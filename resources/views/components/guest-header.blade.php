@@ -8,7 +8,7 @@
                     </svg>
                 </div>
                 <a href="{{ route('home') }}" class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    CRM SaaS
+                    Cliento
                 </a>
             </div>
 
@@ -24,6 +24,10 @@
                 <a href="{{ route('contact') }}" class="relative text-gray-700 hover:text-blue-600 transition-all duration-300 font-semibold text-lg group py-2">
                     Contact
                     <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <!-- Development: Dashboard link -->
+                <a href="{{ route('dashboard') }}" class="relative text-orange-600 hover:text-orange-700 transition-all duration-300 font-semibold text-lg group py-2 border border-orange-600 px-4 rounded-lg">
+                    Dashboard (Dev)
                 </a>
                 
                 <div class="flex items-center space-x-6">

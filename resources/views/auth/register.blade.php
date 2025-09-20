@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', 'Sign Up - CRM SaaS')
+@section('title', 'Sign Up - Cliento')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -44,7 +44,7 @@
                         <input id="name" name="name" type="text" autocomplete="name" required 
                                value="{{ old('name') }}"
                                placeholder="Enter your full name"
-                               class="appearance-none block w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white hover:bg-white @error('name') border-red-500 bg-red-50 @enderror">
+                               class="appearance-none block w-full pl-12 pr-4 py-4 border @error('name') border-red-500 bg-red-50 @else border-gray-300 @enderror rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white hover:bg-white">
                     </div>
                     @error('name')
                         <p class="mt-2 text-sm text-red-600 flex items-center">
@@ -70,7 +70,7 @@
                         <input id="email" name="email" type="email" autocomplete="email" required 
                                value="{{ old('email') }}"
                                placeholder="Enter your email address"
-                               class="appearance-none block w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white hover:bg-white @error('email') border-red-500 bg-red-50 @enderror">
+                               class="appearance-none block w-full pl-12 pr-4 py-4 border @error('email') border-red-500 bg-red-50 @else border-gray-300 @enderror rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white hover:bg-white">
                     </div>
                     @error('email')
                         <p class="mt-2 text-sm text-red-600 flex items-center">
@@ -95,7 +95,7 @@
                         </div>
                         <input id="password" name="password" type="password" autocomplete="new-password" required 
                                placeholder="Create a secure password"
-                               class="appearance-none block w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white hover:bg-white @error('password') border-red-500 bg-red-50 @enderror">
+                               class="appearance-none block w-full pl-12 pr-4 py-4 border @error('password') border-red-500 bg-red-50 @else border-gray-300 @enderror rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white hover:bg-white">
                     </div>
                     @error('password')
                         <p class="mt-2 text-sm text-red-600 flex items-center">
@@ -124,22 +124,6 @@
                     </div>
                 </div>
 
-                <!-- Terms Checkbox -->
-                <div class="flex items-start">
-                    <div class="flex items-center h-6">
-                        <input id="terms" name="terms" type="checkbox" required 
-                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors">
-                    </div>
-                    <div class="ml-3">
-                        <label for="terms" class="text-sm text-gray-700 leading-5">
-                            I agree to the 
-                            <a href="#" class="text-blue-600 hover:text-blue-500 font-medium hover:underline transition-colors">Terms of Service</a> 
-                            and 
-                            <a href="#" class="text-blue-600 hover:text-blue-500 font-medium hover:underline transition-colors">Privacy Policy</a>
-                        </label>
-                    </div>
-                </div>
-
                 <!-- Submit Button -->
                 <div class="pt-2">
                     <button type="submit" 
@@ -149,7 +133,7 @@
                                 <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
                             </svg>
                         </span>
-                        Create Account & Start Free Trial
+                        Create Account 
                     </button>
                 </div>
             </form>

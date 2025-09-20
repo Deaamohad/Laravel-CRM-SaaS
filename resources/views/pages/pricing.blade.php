@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', 'Pricing - CRM SaaS')
+@section('title', 'Pricing - Cliento')
 
 @section('content')
 <style>
@@ -88,7 +88,7 @@
         </h1>
         
         <p class="text-xl lg:text-2xl text-blue-100 max-w-3xl mx-auto font-light leading-relaxed mb-10">
-            CRM SaaS provides unmatched clarity and control for small teams.<br>
+            Cliento provides unmatched clarity and control for small teams.<br>
             <span class="text-white font-medium">Simple, transparent pricing to get you started today.</span>
         </p>
         

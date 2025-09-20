@@ -4,14 +4,23 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
-    return view('main');
+    return view('pages.home');
 })->name('home');
 
-Route::get('/pricing', fn() => view('pricing'))->name('pricing');
-Route::get('/contact', fn() => view('contact'))->name('contact');
-Route::get('/about', fn() => view('about'))->name('about');
+Route::get('/pricing', fn() => view('pages.pricing'))->name('pricing');
+Route::get('/contact', fn() => view('pages.contact'))->name('contact');
+Route::get('/about', fn() => view('pages.about'))->name('about');
+
+// Development: Dashboard without auth (remove auth later)
+Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+// Quick Action Routes (for modal AJAX submissions)
+Route::post('companies/quick-add', [DashboardController::class, 'quickAddCompany'])->name('companies.quick-add');
+Route::post('deals/quick-create', [DashboardController::class, 'quickCreateDeal'])->name('deals.quick-create');
+Route::post('interactions/quick-log', [DashboardController::class, 'quickLogInteraction'])->name('interactions.quick-log');
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {

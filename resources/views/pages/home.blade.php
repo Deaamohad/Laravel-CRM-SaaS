@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', 'CRM SaaS - Simple CRM for Your Business')
+@section('title', 'Cliento - Simple CRM for Your Business')
 
 @section('content')
 <section class="py-20 lg:py-32 bg-gradient-to-br from-gray-50 to-blue-50">
@@ -169,8 +169,10 @@
                     "This CRM has completely transformed how we manage our sales pipeline. We've increased our close rate by 40% in just 3 months!"
                 </blockquote>
                 <div class="flex items-center">
-                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
-                        S
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white mr-4">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                        </svg>
                     </div>
                     <div>
                         <div class="font-semibold text-gray-900">Sarah Johnson</div>
@@ -194,8 +196,10 @@
                     "The analytics and reporting features are incredible. We finally have clear visibility into our sales performance and can make data-driven decisions."
                 </blockquote>
                 <div class="flex items-center">
-                    <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
-                        M
+                    <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white mr-4">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                        </svg>
                     </div>
                     <div>
                         <div class="font-semibold text-gray-900">Michael Chen</div>
@@ -219,8 +223,10 @@
                     "Easy to use, powerful features, and excellent customer support. Our team was up and running in minutes, not hours!"
                 </blockquote>
                 <div class="flex items-center">
-                    <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
-                        E
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white mr-4">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                        </svg>
                     </div>
                     <div>
                         <div class="font-semibold text-gray-900">Emily Rodriguez</div>

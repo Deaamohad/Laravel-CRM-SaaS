@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', 'Contact Us - CRM SaaS')
+@section('title', 'Contact Us - Cliento')
 
 @section('content')
 <section class="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-20 text-white">

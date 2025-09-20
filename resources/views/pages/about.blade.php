@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', 'About Us - CRM SaaS')
+@section('title', 'About Us - Cliento')
 
 @section('content')
 <style>
@@ -134,7 +134,7 @@
                 <h2 class="text-4xl font-bold text-gray-900 mb-8">Our Story</h2>
                 <div class="space-y-6 text-lg text-gray-700 leading-relaxed">
                     <p>
-                        Founded in 2020, CRM SaaS was born from a simple idea: customer relationship management should be powerful yet easy to use. We noticed that many businesses struggled with complex, expensive CRM solutions that required extensive training and setup.
+                        Founded in 2020, Cliento was born from a simple idea: customer relationship management should be powerful yet easy to use. We noticed that many businesses struggled with complex, expensive CRM solutions that required extensive training and setup.
                     </p>
                     <p>
                         Our team of experienced developers and business analysts came together to create a solution that would democratize CRM access for businesses of all sizes. From startups to enterprises, we believe every organization deserves the tools to build meaningful customer relationships.
@@ -244,7 +244,7 @@
     <div class="max-w-4xl mx-auto text-center px-4">
         <h2 class="text-4xl font-bold text-white mb-6">Ready to Transform Your Business?</h2>
         <p class="text-xl text-blue-100 mb-8 font-light leading-relaxed">
-            Join thousands of businesses that trust CRM SaaS to manage their customer relationships.
+            Join thousands of businesses that trust Cliento to manage their customer relationships.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="/pricing" class="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 rounded-lg font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl">

@@ -35,7 +35,7 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('home'))->with('success', 'Welcome back!');
+        return redirect()->intended(route('dashboard'))->with('success', 'Welcome back!');
     }
 
     /**

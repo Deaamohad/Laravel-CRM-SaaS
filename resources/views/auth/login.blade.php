@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', 'Sign In - CRM SaaS')
+@section('title', 'Sign In - Cliento')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">

@@ -4,12 +4,12 @@
             <div class="col-span-1">
                 <div class="flex items-center space-x-3 mb-6">
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                        CRM SaaS
+                        Cliento
                     </h3>
                 </div>
                 <p class="text-gray-400 text-sm leading-relaxed mb-6">
@@ -74,7 +74,7 @@
 
         <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
             <div class="text-gray-400 text-sm mb-4 md:mb-0">
-                © {{ date('Y') }} CRM SaaS. All rights reserved.
+                © {{ date('Y') }} Cliento. All rights reserved.
             </div>
             <div class="flex space-x-6 text-sm">
                 <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
