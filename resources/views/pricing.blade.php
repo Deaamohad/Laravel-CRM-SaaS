@@ -3,12 +3,72 @@
 @section('title', 'Pricing - CRM SaaS')
 
 @section('content')
+<style>
+@keyframes float {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.7;
+    }
+    50% { 
+        transform: translateY(-20px) rotate(180deg);
+        opacity: 1;
+    }
+}
+
+@keyframes floatReverse {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.8;
+    }
+    50% { 
+        transform: translateY(20px) rotate(-180deg);
+        opacity: 0.4;
+    }
+}
+
+@keyframes drift {
+    0% { 
+        transform: translateX(0px) translateY(0px) scale(1);
+    }
+    25% { 
+        transform: translateX(10px) translateY(-15px) scale(1.1);
+    }
+    50% { 
+        transform: translateX(-10px) translateY(-10px) scale(0.9);
+    }
+    75% { 
+        transform: translateX(15px) translateY(5px) scale(1.05);
+    }
+    100% { 
+        transform: translateX(0px) translateY(0px) scale(1);
+    }
+}
+
+.bubble-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.bubble-reverse {
+    animation: floatReverse 8s ease-in-out infinite;
+}
+
+.bubble-drift {
+    animation: drift 10s ease-in-out infinite;
+}
+
+.bubble-glow {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+</style>
+
 <section class="relative bg-gradient-to-br from-blue-800 via-blue-750 to-blue-800 text-white overflow-hidden py-32">
     <div class="absolute inset-0 opacity-10">
-        <div class="absolute top-16 left-16 w-28 h-28 bg-white rounded-full animate-pulse"></div>
-        <div class="absolute top-24 right-24 w-18 h-18 bg-white rounded-full animate-pulse delay-1000"></div>
-        <div class="absolute bottom-24 left-24 w-22 h-22 bg-white rounded-full animate-pulse delay-500"></div>
-        <div class="absolute bottom-16 right-16 w-14 h-14 bg-white rounded-full animate-pulse delay-2000"></div>
+        <div class="absolute top-16 left-16 w-28 h-28 bg-white rounded-full bubble-float bubble-glow"></div>
+        <div class="absolute top-24 right-24 w-18 h-18 bg-white rounded-full bubble-reverse bubble-glow" style="animation-delay: 2s;"></div>
+        <div class="absolute bottom-24 left-24 w-22 h-22 bg-white rounded-full bubble-drift bubble-glow" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-16 right-16 w-14 h-14 bg-white rounded-full bubble-float bubble-glow" style="animation-delay: 3s;"></div>
+        <div class="absolute top-1/2 left-1/3 w-10 h-10 bg-white rounded-full bubble-reverse bubble-glow" style="animation-delay: 4s;"></div>
+        <div class="absolute top-1/3 right-1/3 w-16 h-16 bg-white rounded-full bubble-drift bubble-glow" style="animation-delay: 0.5s;"></div>
     </div>
     
     <div class="max-w-7xl mx-auto text-center px-4 relative z-10">

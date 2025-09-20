@@ -3,14 +3,78 @@
 @section('title', 'About Us - CRM SaaS')
 
 @section('content')
-<!-- Hero Section -->
+<style>
+@keyframes gentleFloat {
+    0%, 100% { 
+        transform: translateY(0px) translateX(0px) scale(1);
+        opacity: 0.6;
+    }
+    33% { 
+        transform: translateY(-15px) translateX(5px) scale(1.1);
+        opacity: 0.9;
+    }
+    66% { 
+        transform: translateY(10px) translateX(-5px) scale(0.95);
+        opacity: 0.7;
+    }
+}
+
+@keyframes spiralDrift {
+    0% { 
+        transform: translateX(0px) translateY(0px) rotate(0deg);
+    }
+    25% { 
+        transform: translateX(20px) translateY(-10px) rotate(90deg);
+    }
+    50% { 
+        transform: translateX(0px) translateY(-20px) rotate(180deg);
+    }
+    75% { 
+        transform: translateX(-20px) translateY(-10px) rotate(270deg);
+    }
+    100% { 
+        transform: translateX(0px) translateY(0px) rotate(360deg);
+    }
+}
+
+@keyframes slowPulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    50% { 
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+}
+
+.bubble-gentle {
+    animation: gentleFloat 7s ease-in-out infinite;
+}
+
+.bubble-spiral {
+    animation: spiralDrift 12s linear infinite;
+}
+
+.bubble-pulse {
+    animation: slowPulse 5s ease-in-out infinite;
+}
+
+.bubble-shimmer {
+    background: linear-gradient(45deg, rgba(255,255,255,0.8), rgba(255,255,255,0.3), rgba(255,255,255,0.8));
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+}
+</style>
+
 <section class="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-32 text-white overflow-hidden">
-    <!-- Background Pattern -->
     <div class="absolute inset-0 opacity-10">
-        <div class="absolute top-20 left-10 w-32 h-32 bg-white rounded-full animate-pulse"></div>
-        <div class="absolute top-40 right-20 w-20 h-20 bg-white rounded-full animate-pulse delay-1000"></div>
-        <div class="absolute bottom-32 left-20 w-24 h-24 bg-white rounded-full animate-pulse delay-500"></div>
-        <div class="absolute bottom-20 right-10 w-16 h-16 bg-white rounded-full animate-pulse delay-2000"></div>
+        <div class="absolute top-20 left-10 w-32 h-32 bg-white rounded-full bubble-gentle bubble-shimmer"></div>
+        <div class="absolute top-40 right-20 w-20 h-20 bg-white rounded-full bubble-spiral bubble-shimmer" style="animation-delay: 2s;"></div>
+        <div class="absolute bottom-32 left-20 w-24 h-24 bg-white rounded-full bubble-pulse bubble-shimmer" style="animation-delay: 1.5s;"></div>
+        <div class="absolute bottom-20 right-10 w-16 h-16 bg-white rounded-full bubble-gentle bubble-shimmer" style="animation-delay: 3s;"></div>
+        <div class="absolute top-1/2 left-1/4 w-12 h-12 bg-white rounded-full bubble-spiral bubble-shimmer" style="animation-delay: 4s;"></div>
+        <div class="absolute top-1/4 right-1/4 w-18 h-18 bg-white rounded-full bubble-pulse bubble-shimmer" style="animation-delay: 0.8s;"></div>
+        <div class="absolute top-3/4 left-1/2 w-14 h-14 bg-white rounded-full bubble-gentle bubble-shimmer" style="animation-delay: 2.5s;"></div>
     </div>
     
     <div class="max-w-6xl mx-auto text-center px-4 relative z-10">
@@ -214,6 +278,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Format the number
             if (target >= 1000) {
                 element.textContent = Math.floor(current).toLocaleString();
+            } else if (target === 24) {
+                // Show 24/7 support as integer
+                element.textContent = Math.floor(current);
             } else {
                 element.textContent = current.toFixed(1);
             }

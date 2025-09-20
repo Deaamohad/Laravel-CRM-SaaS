@@ -1,8 +1,6 @@
-<!-- Enhanced Header with Glassmorphism -->
 <header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-5">
-            <!-- Logo with Gradient -->
             <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
                     <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -14,7 +12,6 @@
                 </a>
             </div>
 
-            <!-- Desktop Navigation -->
             <nav class="hidden md:flex items-center space-x-10">
                 <a href="{{ route('about') }}" class="relative text-gray-700 hover:text-blue-600 transition-all duration-300 font-semibold text-lg group py-2">
                     About
@@ -29,18 +26,28 @@
                     <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
                 </a>
                 
-                <!-- Auth Buttons -->
-                <div class="flex items-center space-x-5 ml-8">
-                    <a href="#" class="text-gray-700 hover:text-blue-600 transition-colors font-semibold text-lg">
-                        Sign In
-                    </a>
-                    <a href="#" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300">
-                        Get Started
-                    </a>
+                <div class="flex items-center space-x-6">
+                    @guest
+                        <a href="{{ route('login') }}" class="text-gray-700 hover:text-blue-600 transition-colors font-semibold text-lg">
+                            Sign In
+                        </a>
+                        <a href="{{ route('register') }}" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+                            Get Started
+                        </a>
+                    @else
+                        <div class="flex items-center space-x-4">
+                            <span class="text-gray-700 font-medium">Hello, {{ Auth::user()->name }}!</span>
+                            <form method="POST" action="{{ route('logout') }}" class="inline">
+                                @csrf
+                                <button type="submit" class="text-gray-700 hover:text-red-600 transition-colors font-semibold text-lg">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                    @endguest
                 </div>
             </nav>
 
-            <!-- Mobile Menu Button -->
             <div class="md:hidden">
                 <button id="mobile-menu-button" class="text-gray-700 hover:text-blue-600 transition-colors p-2">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,21 +58,31 @@
         </div>
     </div>
 
-    <!-- Mobile Menu -->
     <div id="mobile-menu" class="md:hidden hidden bg-white/95 backdrop-blur-md border-t border-gray-200/50">
         <div class="px-6 py-8 space-y-6">
             <a href="{{ route('about') }}" class="block text-gray-700 hover:text-blue-600 transition-colors font-semibold text-lg py-2">About</a>
             <a href="{{ route('pricing') }}" class="block text-gray-700 hover:text-blue-600 transition-colors font-semibold text-lg py-2">Pricing</a>
             <a href="{{ route('contact') }}" class="block text-gray-700 hover:text-blue-600 transition-colors font-semibold text-lg py-2">Contact</a>
             <div class="pt-6 border-t border-gray-200">
-                <a href="#" class="block text-gray-700 hover:text-blue-600 transition-colors font-semibold text-lg py-3">Sign In</a>
-                <a href="#" class="block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-full font-semibold text-lg text-center mt-4 hover:shadow-lg transition-all">Get Started</a>
+                @guest
+                    <a href="{{ route('login') }}" class="block text-gray-700 hover:text-blue-600 transition-colors font-semibold text-lg py-3">Sign In</a>
+                    <a href="{{ route('register') }}" class="block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-full font-semibold text-lg text-center mt-4 hover:shadow-lg transition-all">Get Started</a>
+                @else
+                    <div class="space-y-3">
+                        <div class="text-gray-700 font-medium py-2">Hello, {{ Auth::user()->name }}!</div>
+                        <form method="POST" action="{{ route('logout') }}" class="inline">
+                            @csrf
+                            <button type="submit" class="w-full text-left text-gray-700 hover:text-red-600 transition-colors font-semibold text-lg py-3">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                @endguest
             </div>
         </div>
     </div>
 </header>
 
-<!-- Spacer for fixed header -->
 <div class="h-24"></div>
 
 <script>

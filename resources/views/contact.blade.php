@@ -6,7 +6,6 @@
 <section class="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-20 text-white">
     <div class="max-w-6xl mx-auto px-4">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
-            <!-- Left Side - Large Title -->
             <div>
                 <h1 class="contact-mega-title text-white mb-8 leading-tight">
                     Get in<br>
@@ -31,11 +30,8 @@
                 </div>
             </div>
             
-            <!-- Right Side - Image/Illustration -->
             <div class="relative">
-                <!-- Option 1: Customer Service Illustration (using CSS art) -->
                 <div class="bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl p-12 relative overflow-hidden">
-                    <!-- Background Pattern -->
                     <div class="absolute inset-0 opacity-20">
                         <div class="absolute top-4 left-4 w-16 h-16 bg-white rounded-full"></div>
                         <div class="absolute top-20 right-8 w-8 h-8 bg-white rounded-full"></div>
@@ -43,29 +39,24 @@
                         <div class="absolute bottom-4 right-4 w-6 h-6 bg-white rounded-full"></div>
                     </div>
                     
-                    <!-- Main Illustration -->
                     <div class="relative z-10 text-center">
-                        <!-- Customer Service Rep -->
                         <div class="bg-white rounded-full w-32 h-32 mx-auto mb-6 flex items-center justify-center">
                             <svg class="w-16 h-16 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                             </svg>
                         </div>
                         
-                        <!-- Headset -->
                         <div class="bg-white rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                             <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
                             </svg>
                         </div>
                         
-                        <!-- Support Text -->
                         <div class="text-white">
                             <h3 class="text-2xl font-semibold mb-2">24/7 Support</h3>
                             <p class="text-blue-100">Ready to help you succeed</p>
                         </div>
                         
-                        <!-- Chat Bubbles -->
                         <div class="absolute -top-4 -left-4">
                             <div class="bg-white rounded-lg p-3 shadow-lg">
                                 <div class="flex items-center space-x-2">
@@ -84,14 +75,11 @@
                     </div>
                 </div>
                 
-                <!-- Alternative: You can replace the above with an actual image -->
-                <!-- <img src="/images/contact-hero.jpg" alt="Customer Support Team" class="w-full h-auto rounded-3xl shadow-2xl"> -->
             </div>
         </div>
     </div>
 </section>
 
-<!-- Contact Form & Information Section -->
 <section class="py-20 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4">
         <div class="text-center mb-16">
@@ -102,7 +90,6 @@
         </div>
 
         <div class="grid lg:grid-cols-3 gap-12">
-            <!-- Contact Form - Takes 2 columns -->
             <div class="lg:col-span-2">
                 <div id="contact-form" class="bg-white rounded-2xl shadow-xl p-12 border border-gray-100">
                     <div class="flex items-center mb-10">
@@ -118,7 +105,6 @@
                     </div>
 
                     <form class="space-y-8">
-                        <!-- Personal Information -->
                         <div>
                             <h4 class="contact-section-header">Personal Information</h4>
                             <div class="grid md:grid-cols-2 gap-6">
@@ -133,7 +119,6 @@
                             </div>
                         </div>
 
-                        <!-- Contact Details -->
                         <div>
                             <h4 class="contact-section-header">Contact Details</h4>
                             <div class="grid md:grid-cols-2 gap-6">
@@ -148,7 +133,6 @@
                             </div>
                         </div>
 
-                        <!-- Business Information -->
                         <div>
                             <h4 class="contact-section-header">Business Information</h4>
                             <div class="grid md:grid-cols-2 gap-6">
@@ -173,7 +157,6 @@
                             </div>
                         </div>
 
-                        <!-- Inquiry Details -->
                         <div>
                             <h4 class="contact-section-header">How Can We Help?</h4>
                             <div class="mb-6">
@@ -195,7 +178,6 @@
                             </div>
                         </div>
 
-                        <!-- Submit Button -->
                         <div class="pt-6">
                             <button type="submit" class="btn-primary w-full text-lg py-4 font-bold tracking-wide shadow-lg hover:shadow-xl transition-all duration-300">
                                 <svg class="w-6 h-6 mr-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,9 +193,7 @@
                 </div>
             </div>
 
-            <!-- Contact Information Sidebar -->
             <div class="space-y-8">
-                <!-- Office Information -->
                 <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
                     <div class="flex items-center mb-6">
                         <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-4 mr-4 shadow-lg">
@@ -244,7 +224,6 @@
                     </div>
                 </div>
 
-                <!-- Contact Methods -->
                 <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
                     <div class="flex items-center mb-6">
                         <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 mr-4 shadow-lg">
@@ -286,7 +265,6 @@
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
                 <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg p-8 text-white">
                     <div class="text-center">
                         <div class="bg-white bg-opacity-20 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
@@ -311,7 +289,6 @@
             </div>
         </div>
 
-        <!-- Additional Information -->
         <div class="mt-16 grid md:grid-cols-3 gap-8">
             <div class="text-center p-6">
                 <div class="bg-purple-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
