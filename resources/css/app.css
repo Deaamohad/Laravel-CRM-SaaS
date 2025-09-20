@@ -9,3 +9,173 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@layer components {
+    .btn-primary {
+        @apply bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium;
+    }
+    
+    .btn-secondary {
+        @apply bg-gray-200 text-gray-900 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors font-medium;
+    }
+    
+    .btn-outline {
+        @apply border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors font-medium;
+    }
+    
+    .link-nav {
+        @apply text-gray-600 hover:text-gray-900 px-3 py-2 transition-colors;
+    }
+    
+    .pricing-card {
+        @apply bg-white rounded-lg shadow-sm p-8;
+    }
+    
+    .pricing-card-featured {
+        @apply bg-white rounded-lg shadow-sm p-8 border-2 border-blue-500 relative;
+    }
+    
+    .pricing-card-badge {
+        @apply absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium;
+    }
+    
+    .pricing-card-title {
+        @apply text-xl font-semibold text-gray-900 mb-6;
+    }
+    
+    .pricing-card-price {
+        @apply mb-8;
+    }
+    
+    .pricing-card-price-amount {
+        @apply text-4xl font-bold text-gray-900;
+    }
+    
+    .pricing-card-price-period {
+        @apply text-gray-600;
+    }
+    
+    .pricing-card-features {
+        @apply text-left space-y-4 mb-10;
+    }
+    
+    .pricing-card-feature {
+        @apply flex items-center text-gray-600;
+    }
+    
+    .pricing-card-feature-icon {
+        @apply w-5 h-5 text-green-500 mr-3;
+    }
+    
+    .hover-lift {
+        @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer;
+    }
+    
+    .form-input {
+        @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+    }
+    
+    .form-label {
+        @apply block text-sm font-medium text-gray-700 mb-1;
+    }
+    
+    .hero-title {
+        @apply text-4xl font-bold text-gray-900 mb-6;
+    }
+    
+    .hero-subtitle {
+        @apply text-xl text-gray-600 mb-8;
+    }
+    
+    .contact-mega-title {
+        @apply text-7xl lg:text-8xl font-black tracking-tight leading-none;
+    }
+    
+    .contact-section-title {
+        @apply text-3xl font-bold text-gray-900 mb-4 tracking-tight;
+    }
+    
+    .contact-form-title {
+        @apply text-2xl font-semibold text-gray-900 tracking-tight;
+    }
+    
+    .contact-form-subtitle {
+        @apply text-gray-600 font-medium;
+    }
+    
+    .contact-section-header {
+        @apply text-sm font-semibold text-gray-900 mb-4 tracking-wide uppercase;
+    }
+    
+    .contact-info-title {
+        @apply text-xl font-bold text-gray-900 tracking-tight;
+    }
+    
+    .contact-info-subtitle {
+        @apply text-gray-600 leading-relaxed;
+    }
+    
+    .contact-highlight-text {
+        @apply text-blue-600 font-semibold hover:text-blue-700 transition-colors;
+    }
+    
+    .form-input-enhanced {
+        @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium;
+    }
+    
+    .form-label-enhanced {
+        @apply block text-sm font-semibold text-gray-700 mb-2 tracking-wide;
+    }
+    
+    .pricing-hero-title {
+        @apply text-6xl lg:text-7xl font-black tracking-tight leading-none text-white mb-8;
+    }
+    
+    .pricing-hero-subtitle {
+        @apply text-2xl text-blue-100 max-w-3xl mx-auto font-light leading-relaxed;
+    }
+    
+    .pricing-section-title {
+        @apply text-5xl font-bold text-gray-900 mb-6 tracking-tight;
+    }
+    
+    .pricing-section-subtitle {
+        @apply text-xl text-gray-600 font-light leading-relaxed;
+    }
+    
+    .pricing-card-enhanced {
+        @apply bg-white rounded-2xl shadow-xl p-10 border border-gray-100;
+    }
+    
+    .pricing-card-featured-enhanced {
+        @apply bg-white rounded-2xl shadow-2xl p-10 border-2 border-blue-500 relative transform scale-105;
+    }
+    
+    .pricing-card-title-enhanced {
+        @apply text-2xl font-bold text-gray-900 mb-4 tracking-tight;
+    }
+    
+    .pricing-card-description {
+        @apply text-gray-700 text-base mb-6 font-medium leading-relaxed;
+    }
+    
+    .pricing-card-price-enhanced {
+        @apply mb-10;
+    }
+    
+    .pricing-card-price-amount-enhanced {
+        @apply text-5xl font-black text-gray-900 tracking-tight;
+    }
+    
+    .pricing-card-features-enhanced {
+        @apply text-left space-y-5 mb-12;
+    }
+    
+    .pricing-card-feature-enhanced {
+        @apply flex items-center text-gray-800 text-lg font-semibold;
+    }
+    
+    .pricing-card-feature-icon-enhanced {
+        @apply w-6 h-6 text-emerald-500 mr-4 flex-shrink-0;
+    }
+}
