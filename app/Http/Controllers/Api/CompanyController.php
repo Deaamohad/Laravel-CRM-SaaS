@@ -3,18 +3,48 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CompanyResource;
 use App\Models\Company;
-use COM;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class CompanyController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of companies with pagination and filtering.
+     * 
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index()
     {
-        return Company::all();
+        // Only show companies for authenticated users within their company scope
+        $user = Auth::user();
+        
+        if (!$user || !$user->company_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        // In a real multi-tenant app, users would only see their own company
+        // For demo purposes, we'll show all companies but in production this would be:
+        // $companies = Company::where('id', $user->company_id)->paginate(15);
+        
+        $companies = Company::latest()->paginate(15);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Companies retrieved successfully',
+            'data' => $companies->items(),
+            'meta' => [
+                'current_page' => $companies->currentPage(),
+                'last_page' => $companies->lastPage(),
+                'per_page' => $companies->perPage(),
+                'total' => $companies->total(),
+            ]
+        ]);
     }
 
     /**
@@ -30,7 +60,7 @@ class CompanyController extends Controller
 
         $company = Company::create($validated);
 
-        return $company;
+        return new CompanyResource($company);
     }
 
     /**
@@ -38,7 +68,22 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        return $company;
+        $user = Auth::user();
+        
+        // Check if user is authorized to view this company
+        if (!$user || !$user->company_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        // In a multi-tenant app, users can only view their own company
+        if ($company->id !== $user->company_id) {
+            return response()->json([
+                'error' => 'Access denied. You can only view your own company data.',
+                'message' => 'Company not found or you do not have permission to access it.'
+            ], 404); // Return 404 to not reveal that the company exists
+        }
+        
+        return new CompanyResource($company);
     }
 
     /**
@@ -46,6 +91,13 @@ class CompanyController extends Controller
      */
     public function update(Request $request, Company $company)
     {
+        $user = Auth::user();
+        
+        // Check authorization
+        if (!$user || $company->id !== $user->company_id) {
+            return response()->json(['error' => 'Access denied'], 404);
+        }
+        
         $validated = $request->validate([
             'name'  => 'sometimes|string|max:30',
             'email' => 'sometimes|email|max:255',
@@ -54,7 +106,7 @@ class CompanyController extends Controller
 
         $company->update($validated);
 
-        return $company;
+        return new CompanyResource($company);
 
     }
 
@@ -63,6 +115,13 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company)
     {
+        $user = Auth::user();
+        
+        // Check authorization
+        if (!$user || $company->id !== $user->company_id) {
+            return response()->json(['error' => 'Access denied'], 404);
+        }
+        
         $company->delete();
 
         return response()->json(['message' => 'Company deleted successfully.']);

@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'company_id',
     ];
 
     /**
@@ -44,5 +45,37 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the company that the user belongs to.
+     */
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    /**
+     * Get contacts created by this user.
+     */
+    public function contacts()
+    {
+        return $this->hasMany(Contact::class);
+    }
+
+    /**
+     * Get deals created by this user.
+     */
+    public function deals()
+    {
+        return $this->hasMany(Deal::class);
+    }
+
+    /**
+     * Get interactions created by this user.
+     */
+    public function interactions()
+    {
+        return $this->hasMany(Interaction::class);
     }
 }

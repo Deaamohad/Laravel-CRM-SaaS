@@ -5,6 +5,40 @@
 @section('page-description', 'Welcome back! Here\'s what\'s happening with your business.')
 
 @section('content')
+<!-- Flash Messages -->
+@if(session('success'))
+    <div class="mb-6 bg-green-50 border-l-4 border-green-400 p-4 rounded-md">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-green-700 font-medium">{{ session('success') }}</p>
+            </div>
+        </div>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L10 11.414l2.707-2.707a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-red-700 font-medium">{{ session('error') }}</p>
+            </div>
+        </div>
+    </div>
+@endif
+
+<!-- Include notification component (for any remaining JavaScript notifications) -->
+@include('components.notification')
+
 <div class="space-y-6">
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -13,7 +47,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Total Companies</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ number_format($stats['total_companies']) }}</p>
+                    <p class="text-3xl font-bold text-gray-900 companies-count">{{ number_format($stats['total_companies']) }}</p>
                 </div>
                 <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -32,7 +66,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Total Deals</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ number_format($stats['total_deals']) }}</p>
+                    <p class="text-3xl font-bold text-gray-900 deals-count">{{ number_format($stats['total_deals']) }}</p>
                 </div>
                 <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
@@ -51,7 +85,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Total Revenue</p>
-                    <p class="text-3xl font-bold text-gray-900">${{ number_format($stats['total_revenue']) }}</p>
+                    <p class="text-3xl font-bold text-gray-900 total-revenue">${{ number_format($stats['total_revenue']) }}</p>
                 </div>
                 <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
@@ -71,7 +105,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Conversion Rate</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ $stats['conversion_rate'] }}%</p>
+                    <p class="text-3xl font-bold text-gray-900 conversion-rate">{{ $stats['conversion_rate'] }}%</p>
                 </div>
                 <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
@@ -93,8 +127,8 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-900">Deals Overview</h3>
                 <div class="flex space-x-2">
-                    <button class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md">6M</button>
-                    <button class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-100 rounded-md">1Y</button>
+                    <button class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md cursor-pointer">6M</button>
+                    <button class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-100 rounded-md cursor-pointer">1Y</button>
                 </div>
             </div>
             
@@ -117,10 +151,10 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-900">Recent Activity</h3>
-                <a href="#" class="text-sm text-blue-600 hover:text-blue-700">View all</a>
+                <a href="{{ route('interactions.index') }}" class="text-sm text-blue-600 hover:text-blue-700">View all</a>
             </div>
             
-            <div class="space-y-4">
+            <div class="space-y-4" id="recent-activity-list">
                 @forelse($stats['recent_interactions'] as $interaction)
                 <div class="flex items-start space-x-3">
                     <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -148,7 +182,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-900">Recent Companies</h3>
-                <a href="#" class="text-sm text-blue-600 hover:text-blue-700">View all</a>
+                <a href="{{ route('companies.index') }}" class="text-sm text-blue-600 hover:text-blue-700">View all</a>
             </div>
             
             <div class="space-y-4">
@@ -177,7 +211,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-lg font-semibold text-gray-900">Recent Deals</h3>
-                <a href="#" class="text-sm text-blue-600 hover:text-blue-700">View all</a>
+                <a href="{{ route('deals.index') }}" class="text-sm text-blue-600 hover:text-blue-700">View all</a>
             </div>
             
             <div class="space-y-4">
@@ -198,11 +232,13 @@
                     <div class="text-right">
                         <p class="text-sm font-medium text-gray-900">${{ number_format($deal->value) }}</p>
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                            @if($deal->stage === 'closed') bg-green-100 text-green-800
+                            @if($deal->stage === 'closed-won') bg-green-100 text-green-800
+                            @elseif($deal->stage === 'closed-lost') bg-red-100 text-red-800
                             @elseif($deal->stage === 'new') bg-yellow-100 text-yellow-800
+                            @elseif($deal->stage === 'negotiation') bg-blue-100 text-blue-800
                             @else bg-gray-100 text-gray-800
                             @endif">
-                            {{ ucfirst($deal->stage) }}
+                            {{ ucfirst(str_replace('-', ' ', $deal->stage)) }}
                         </span>
                     </div>
                 </div>
@@ -352,7 +388,8 @@
                     <option value="qualified">Qualified</option>
                     <option value="proposal">Proposal</option>
                     <option value="negotiation">Negotiation</option>
-                    <option value="closed">Closed</option>
+                    <option value="closed-won">Closed Won</option>
+                    <option value="closed-lost">Closed Lost</option>
                 </select>
             </div>
             
@@ -456,88 +493,6 @@ document.addEventListener('click', function(e) {
         if (modal.style.display === 'flex' && e.target === modal) {
             closeModal(modalId);
         }
-    });
-});
-
-// Form submissions
-document.getElementById('addCompanyForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch('/companies/quick-add', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeModal('addCompanyModal');
-            location.reload(); // Refresh to show new company
-        } else {
-            alert('Error adding company: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error adding company');
-    });
-});
-
-document.getElementById('createDealForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch('/deals/quick-create', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeModal('createDealModal');
-            location.reload(); // Refresh to show new deal
-        } else {
-            alert('Error creating deal: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error creating deal');
-    });
-});
-
-document.getElementById('logInteractionForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch('/interactions/quick-log', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeModal('logInteractionModal');
-            location.reload(); // Refresh to show new interaction
-        } else {
-            alert('Error logging interaction: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error logging interaction');
     });
 });
 </script>

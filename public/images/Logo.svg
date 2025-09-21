@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Grafika (https://www.grafika.cc/) -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1589.7" height="2143.9" viewBox="0 0 529.9 714.63" preserveAspectRatio="xMidYMid meet">
+	<defs>
+		<linearGradient gradientUnits="userSpaceOnUse" gradientTransform="matrix(-265.4690856933594, -357.3163757324219, 481.88482666015625, -358.01739501953125, -0.37335485219955444, -0.000005692243576049805)" spreadMethod="pad" id="gradient_1" x1="-1" y1="0" x2="1" y2="0">
+			<stop offset="0%" stop-color="#9333EA" stop-opacity="1" />
+			<stop offset="100%" stop-color="#2563EB" stop-opacity="1" />
+		</linearGradient>
+	</defs>
+	<path transform="matrix(1, 0, 0, 1, 264.802734375, 357.31640625)" d="M-23.94,-357.32 L-118.22,-302.88 L-118.22,180.74 C-118.22,187.64 -120.66,193.53 -125.54,198.41 C-127.6,200.47 -129.85,202.06 -132.27,203.25 C-135.31,205.34 -138.67,206.64 -142.36,207.17 C-143.59,207.34 -144.85,207.43 -146.16,207.43 L-264.8,207.43 L-23.94,356.29 L-23.94,-357.32 ZM24.24,-356.29 L24.24,357.32 L118.51,302.88 L118.51,-180.74 C118.51,-187.64 120.95,-193.53 125.83,-198.41 C127.89,-200.47 130.14,-202.06 132.56,-203.25 C136.62,-206.03 141.24,-207.43 146.45,-207.43 L265.1,-207.43 L24.24,-356.29 ZM-168.19,-274.04 L-264.8,-218.26 L-264.8,157.46 L-168.19,157.46 L-168.19,-274.04 ZM168.48,-157.46 L168.48,274.04 L265.1,218.26 L265.1,-157.46 L168.48,-157.46 Z" fill-rule="evenodd" style="fill:url(#gradient_1);" />
+</svg>

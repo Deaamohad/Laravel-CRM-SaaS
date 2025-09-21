@@ -1,7 +1,8 @@
 <header class="bg-white shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-6">
-            <div class="flex items-center">
+            <div class="flex items-center space-x-3">
+                <img src="{{ asset('images/Logo.svg') }}" alt="Logo" class="w-8 h-8">
                 <h1 class="text-2xl font-bold text-gray-900">Cliento</h1>
             </div>
             <nav class="flex space-x-4">

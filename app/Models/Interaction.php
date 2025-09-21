@@ -13,6 +13,29 @@ class Interaction extends Model
         'type',
         'notes',
         'company_id',
-        'user_id'
+        'user_id',
+        'contact_id',
+        'deal_id',
+        'interaction_date'
     ];
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function contact()
+    {
+        return $this->belongsTo(Contact::class);
+    }
+
+    public function deal()
+    {
+        return $this->belongsTo(Deal::class);
+    }
 }

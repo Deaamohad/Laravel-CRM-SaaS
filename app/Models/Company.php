@@ -14,4 +14,36 @@ class Company extends Model
         'email', 
         'phone'
     ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    // Relationships
+    public function contacts()
+    {
+        return $this->hasMany(Contact::class);
+    }
+
+    public function deals()
+    {
+        return $this->hasMany(Deal::class);
+    }
+
+    public function interactions()
+    {
+        return $this->hasMany(Interaction::class);
+    }
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
+    // Accessor for company initials
+    public function getInitialsAttribute()
+    {
+        return strtoupper(substr($this->name, 0, 1));
+    }
 }

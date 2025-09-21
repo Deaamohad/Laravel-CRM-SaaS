@@ -27,6 +27,43 @@
 
     <div class="mt-8 relative z-10 sm:mx-auto sm:w-full sm:max-w-md">
         <div class="bg-white/90 backdrop-blur-xl py-10 px-6 shadow-2xl rounded-3xl sm:px-12 border border-white/50 hover:shadow-3xl transition-all duration-500">
+            
+            <!-- Error Messages -->
+            @if(session('error'))
+                <div class="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L10 11.414l2.707-2.707a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700 font-medium">{{ session('error') }}</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L10 11.414l2.707-2.707a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700 font-medium">Please fix the following errors:</p>
+                            <ul class="mt-1 text-sm text-red-600 list-disc list-inside">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @endif
+            
             <form class="space-y-6" method="POST" action="{{ route('register') }}">
                 @csrf
 

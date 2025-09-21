@@ -19,6 +19,7 @@ class InteractionFactory extends Factory
         return [
             'type' => fake()->randomElement(['call', 'email', 'meeting']),
             'notes' => fake()->paragraph(),
+            'interaction_date' => fake()->dateTimeBetween('-30 days', 'now'),
         ];
     }
 }

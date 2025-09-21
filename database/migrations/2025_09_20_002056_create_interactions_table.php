@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->timestamp('interaction_date')->nullable();
             $table->timestamps();
         });
     }

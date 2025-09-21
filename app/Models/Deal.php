@@ -17,6 +17,12 @@ class Deal extends Model
         'user_id'
     ];
 
+    protected $casts = [
+        'value' => 'decimal:2',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     public function company()
     {
         return $this->belongsTo(Company::class);
@@ -25,5 +31,27 @@ class Deal extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function interactions()
+    {
+        return $this->hasMany(Interaction::class);
+    }
+
+    // Scopes for common queries
+    public function scopeClosed($query)
+    {
+        return $query->where('stage', 'closed-won');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('stage', 'new');
+    }
+
+    public function scopeThisMonth($query)
+    {
+        return $query->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year);
     }
 }
