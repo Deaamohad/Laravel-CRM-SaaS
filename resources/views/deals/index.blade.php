@@ -13,6 +13,29 @@
             Create Deal
         </button>
     </div>
+    
+    <!-- Flash Messages -->
+    @if (session('success'))
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            {{ session('success') }}
+        </div>
+    </div>
+    @endif
+
+    @if (session('error'))
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded shadow-sm">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            {{ session('error') }}
+        </div>
+    </div>
+    @endif
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
@@ -46,10 +69,7 @@
         </div>
     </div>
 
-    <!-- Search and Filter Component -->
-    <form method="GET" action="{{ route('deals.index') }}">
-        @include('components.search-filter', ['type' => 'deals'])
-    </form>
+
 
     <!-- Deals Table -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -142,43 +162,53 @@
             </div>
         </div>
         
-        <form id="createDealForm" class="p-6 space-y-4">
+        <form id="createDealForm" action="{{ route('deals.store') }}" method="POST" class="p-6 space-y-4">
             @csrf
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Deal Title *</label>
-                <input type="text" name="title" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                <input type="text" name="title" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" value="{{ old('title') }}">
+                @error('title')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Value *</label>
                 <div class="relative">
                     <span class="absolute left-3 top-3 text-gray-500">$</span>
-                    <input type="number" name="value" required step="0.01" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <input type="number" name="amount" required step="0.01" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" value="{{ old('amount') }}">
                 </div>
+                @error('amount')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Company *</label>
                 <select name="company_id" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="">Select Company</option>
-                    @php
-                        $companies = \App\Models\Company::latest()->take(20)->get();
-                    @endphp
                     @foreach($companies as $company)
-                        <option value="{{ $company->id }}">{{ $company->name }}</option>
+                        <option value="{{ $company->id }}" {{ old('company_id') == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
                     @endforeach
                 </select>
+                @error('company_id')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Stage</label>
                 <select name="stage" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    <option value="new">New</option>
-                    <option value="qualified">Qualified</option>
-                    <option value="proposal">Proposal</option>
-                    <option value="negotiation">Negotiation</option>
-                    <option value="closed">Closed</option>
+                    <option value="lead" {{ old('stage') == 'lead' ? 'selected' : '' }}>Lead</option>
+                    <option value="qualified" {{ old('stage') == 'qualified' ? 'selected' : '' }}>Qualified</option>
+                    <option value="proposal" {{ old('stage') == 'proposal' ? 'selected' : '' }}>Proposal</option>
+                    <option value="negotiation" {{ old('stage') == 'negotiation' ? 'selected' : '' }}>Negotiation</option>
+                    <option value="closed-won" {{ old('stage') == 'closed-won' ? 'selected' : '' }}>Closed Won</option>
+                    <option value="closed-lost" {{ old('stage') == 'closed-lost' ? 'selected' : '' }}>Closed Lost</option>
                 </select>
+                @error('stage')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
             
             <div class="flex space-x-3 pt-4">
@@ -194,8 +224,8 @@
 </div>
 
 <!-- Edit Deal Modal -->
-<div id="editDealModal" class="fixed inset-0 z-50 items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 transform transition-all my-8 max-h-screen overflow-y-auto">
+<div id="editDealModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 transform transition-all mt-8 max-h-screen overflow-y-auto pt-0">
         <div class="bg-gradient-to-r from-blue-600 to-green-600 rounded-t-2xl p-6">
             <div class="flex justify-between items-center">
                 <h3 class="text-xl font-bold text-white">Edit Deal</h3>
@@ -207,8 +237,10 @@
             </div>
         </div>
         
-        <form id="editDealForm" class="px-6 pb-6 space-y-4">
+        <form id="editDealForm" class="px-6 py-6 space-y-4" action="{{ route('deals.update', 0) }}" method="POST" onsubmit="updateFormAction(this)">
             <input type="hidden" name="deal_id" id="edit_deal_id">
+            @csrf
+            @method('PUT')
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Deal Title *</label>
@@ -227,13 +259,13 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Company *</label>
                 <select name="company_id" id="edit_company_id" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="">Select Company</option>
-                    @php
-                        $companies = \App\Models\Company::latest()->take(20)->get();
-                    @endphp
                     @foreach($companies as $company)
                         <option value="{{ $company->id }}">{{ $company->name }}</option>
                     @endforeach
                 </select>
+                @if(count($companies) == 0)
+                    <p class="text-red-500 text-xs mt-1">No companies available. Please create a company first.</p>
+                @endif
             </div>
             
             <div>
@@ -265,39 +297,7 @@
     </div>
 </div>
 
-<!-- Delete Deal Confirmation Modal -->
-<div id="deleteDealModal" class="fixed inset-0 z-50 items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
-        <div class="p-6">
-            <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Delete Deal</h3>
-                    <p class="text-sm text-gray-600">Are you sure you want to delete this deal?</p>
-                </div>
-            </div>
-            
-            <div class="bg-red-50 rounded-lg p-4 mb-6">
-                <p class="text-sm text-red-800">
-                    <strong>Warning:</strong> This action cannot be undone. The deal and all associated data will be permanently removed.
-                </p>
-            </div>
-            
-            <div class="flex space-x-3">
-                <button onclick="confirmDeleteDeal()" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
-                    Yes, Delete Deal
-                </button>
-                <button onclick="closeModal('deleteDealModal')" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Delete Deal Confirmation Modal is now merged with the other one below -->
 
 <script>
 function openModal(modalId) {
@@ -318,112 +318,166 @@ function closeModal(modalId) {
     }
 }
 
-// Form submission
-document.getElementById('createDealForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch('/deals', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeModal('createDealModal');
-            location.reload();
-        } else {
-            alert('Error creating deal: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error creating deal');
-    });
-});
+// Using standard Laravel form submission with flash messages
+// The form has action="{{ route('deals.store') }}" method="POST" already set
 
 // Edit Deal Functions
 function editDeal(dealId) {
-    fetch(`/deals/${dealId}`)
-    .then(response => response.json())
+    fetch(`/deals/${dealId}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(deal => {
         document.getElementById('edit_deal_id').value = deal.id;
         document.getElementById('edit_title').value = deal.title;
-        document.getElementById('edit_amount').value = deal.amount;
-        document.getElementById('edit_company_id').value = deal.company_id;
+        document.getElementById('edit_amount').value = deal.value; // Changed from amount to value
+        
+        // Get the company select dropdown
+        const companySelect = document.getElementById('edit_company_id');
+        
+        // Clear existing options except the first one (Select Company)
+        while (companySelect.options.length > 1) {
+            companySelect.remove(1);
+        }
+        
+        // Check if company data is available in the deal object
+        if (deal.company && deal.company.id && deal.company.name) {
+            // Add the current company as an option
+            let optionExists = false;
+            
+            // Check if this company already exists in the dropdown
+            for (let i = 0; i < companySelect.options.length; i++) {
+                if (companySelect.options[i].value == deal.company_id) {
+                    optionExists = true;
+                    break;
+                }
+            }
+            
+            // If it doesn't exist, add it
+            if (!optionExists) {
+                const option = document.createElement('option');
+                option.value = deal.company.id;
+                option.text = deal.company.name;
+                companySelect.appendChild(option);
+            }
+            
+            // Set the selected value
+            companySelect.value = deal.company_id;
+        } else {
+            // If no company data, show a message
+            console.warn('No company data available for this deal');
+            
+            // Add a temporary option for the current company ID
+            const option = document.createElement('option');
+            option.value = deal.company_id;
+            option.text = 'Company #' + deal.company_id;
+            companySelect.appendChild(option);
+            companySelect.value = deal.company_id;
+        }
+        
         document.getElementById('edit_stage').value = deal.stage;
-        document.getElementById('edit_description').value = deal.description || '';
+        
+        // Update the form action URL with the correct ID
+        const form = document.getElementById('editDealForm');
+        form.action = form.action.replace(/\/0$/, `/${deal.id}`);
+        
         openModal('editDealModal');
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error loading deal data');
+        alert('Unable to load deal data. Please try again.');
     });
 }
 
-// Edit form submission
-document.getElementById('editDealForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
+// Helper function to update form action before submit
+function updateFormAction(form) {
     const dealId = document.getElementById('edit_deal_id').value;
-    const formData = new FormData(this);
-    
-    fetch(`/deals/${dealId}`, {
-        method: 'PUT',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeModal('editDealModal');
-            location.reload();
-        } else {
-            alert('Error updating deal: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error updating deal');
-    });
-});
+    form.action = form.action.replace(/\/\d+$/, `/${dealId}`);
+    // Form will submit normally - no need to prevent default
+}
 
 // Delete Deal Function
-let dealToDelete = null;
-
 function deleteDeal(dealId) {
-    dealToDelete = dealId;
+    // Set the form action with the correct deal ID
+    const form = document.getElementById('deleteDealForm');
+    form.action = form.action.replace(/\/\d+$/, `/${dealId}`);
+    
+    // Store the deal ID in a variable for use by confirmDeleteDeal
+    window.currentDealId = dealId;
+    
+    // Show the modal
     openModal('deleteDealModal');
 }
 
+// Function to handle delete deal submission
 function confirmDeleteDeal() {
-    if (dealToDelete) {
-        fetch(`/deals/${dealToDelete}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                closeModal('deleteDealModal');
-                location.reload();
-            } else {
-                alert('Error deleting deal: ' + (data.message || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error deleting deal');
-        });
+    if (window.currentDealId) {
+        document.getElementById('deleteDealForm').submit();
+    } else {
+        console.error('No deal selected for deletion');
+    }
+}
+
+// Function to handle delete deal submission
+function confirmDeleteDeal() {
+    if (window.currentDealId) {
+        document.getElementById('deleteDealForm').submit();
+    } else {
+        console.error('No deal selected for deletion');
     }
 }
 </script>
+<!-- Delete Deal Modal -->
+<div id="deleteDealModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Delete Deal</h3>
+                        <p class="text-sm text-gray-600">Are you sure you want to delete this deal?</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('deleteDealModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="bg-red-50 rounded-lg p-4 mb-6">
+                <p class="text-sm text-red-800">
+                    <strong>Warning:</strong> This action cannot be undone. The deal and all associated data will be permanently removed.
+                </p>
+            </div>
+            
+            <form id="deleteDealForm" action="{{ route('deals.destroy', 0) }}" method="POST">
+                @csrf
+                @method('DELETE')
+                
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-all">
+                        Yes, Delete Deal
+                    </button>
+                    <button type="button" onclick="closeModal('deleteDealModal')" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection

@@ -12,7 +12,9 @@ class Company extends Model
     protected $fillable = [
         'name',
         'email', 
-        'phone'
+        'phone',
+        'industry',
+        'user_id'
     ];
 
     protected $casts = [
@@ -21,11 +23,6 @@ class Company extends Model
     ];
 
     // Relationships
-    public function contacts()
-    {
-        return $this->hasMany(Contact::class);
-    }
-
     public function deals()
     {
         return $this->hasMany(Deal::class);
@@ -39,6 +36,11 @@ class Company extends Model
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     // Accessor for company initials

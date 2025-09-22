@@ -31,10 +31,29 @@
         </div>
     </div>
 
-    <!-- Search and Filter Component -->
-    <form method="GET" action="{{ route('companies.index') }}">
-        @include('components.search-filter', ['type' => 'companies'])
-    </form>
+    <!-- Flash Messages -->
+    @if (session('success'))
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            {{ session('success') }}
+        </div>
+    </div>
+    @endif
+
+    @if (session('error'))
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded shadow-sm">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            {{ session('error') }}
+        </div>
+    </div>
+    @endif
+
 
     <!-- Companies Table -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -48,7 +67,7 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Industry</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email/Phone</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -62,7 +81,7 @@
                                     <span class="text-white font-semibold text-sm">{{ substr($company->name, 0, 1) }}</span>
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">{{ $company->name }}</div>
+                                    <div class="text-sm font-medium text-gray-900 truncate max-w-xs" title="{{ $company->name }}">{{ $company->name }}</div>
                                 </div>
                             </div>
                         </td>
@@ -77,6 +96,7 @@
                             {{ $company->created_at->format('M d, Y') }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="{{ route('companies.show', $company) }}" class="text-green-600 hover:text-green-900 mr-3 cursor-pointer">View</a>
                             <button onclick="editCompany({{ $company->id }})" class="text-blue-600 hover:text-blue-900 mr-3 cursor-pointer">Edit</button>
                             <button onclick="deleteCompany({{ $company->id }})" class="text-red-600 hover:text-red-900 cursor-pointer">Delete</button>
                         </td>
@@ -105,7 +125,7 @@
 </div>
 
 <!-- Add Company Modal (reuse from dashboard) -->
-<div id="addCompanyModal" class="fixed inset-0 z-50 items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+<div id="addCompanyModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
         <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-2xl p-6">
             <div class="flex justify-between items-center">
@@ -118,36 +138,42 @@
             </div>
         </div>
         
-        <form id="addCompanyForm" class="p-6 space-y-4">
+        <form id="addCompanyForm" action="{{ route('companies.store') }}" method="POST" class="p-6 space-y-4">
             @csrf
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Company Name *</label>
-                <input type="text" name="name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <div class="border-b border-gray-200 pb-4 mb-4">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Company Information</h4>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Company Name * <span class="text-xs text-gray-500">(max 50 characters)</span></label>
+                    <input type="text" name="name" required maxlength="50" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                    <select name="industry" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Select Industry</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Education">Education</option>
+                        <option value="Retail">Retail</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                    <input type="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
+                    <input type="tel" name="phone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
             </div>
             
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Industry</label>
-                <select name="industry" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">Select Industry</option>
-                    <option value="Technology">Technology</option>
-                    <option value="Healthcare">Healthcare</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Education">Education</option>
-                    <option value="Retail">Retail</option>
-                    <option value="Manufacturing">Manufacturing</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                <input type="email" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                <input type="tel" name="phone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            </div>
+            <!-- Primary contact section has been removed -->
             
             <div class="flex space-x-3 pt-4">
                 <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
@@ -162,8 +188,8 @@
 </div>
 
 <!-- Edit Company Modal -->
-<div id="editCompanyModal" class="fixed inset-0 z-50 items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 transform transition-all my-8 max-h-screen overflow-y-auto">
+<div id="editCompanyModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 transform transition-all max-h-screen overflow-y-auto pt-0 mt-8">
         <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-t-2xl p-6">
             <div class="flex justify-between items-center">
                 <h3 class="text-xl font-bold text-white">Edit Company</h3>
@@ -175,27 +201,38 @@
             </div>
         </div>
         
-        <form id="editCompanyForm" class="px-6 pb-6 space-y-4">
+        <form id="editCompanyForm" action="{{ route('companies.update', 0) }}" method="POST" class="px-6 pb-6 space-y-4 pt-4">
             <input type="hidden" name="company_id" id="edit_company_id">
+            @csrf
+            @method('PUT')
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
-                <input type="text" name="name" id="edit_name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Company Name * <span class="text-xs text-gray-500">(max 50 characters)</span></label>
+                <input type="text" name="name" id="edit_name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required maxlength="50">
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                <textarea name="address" id="edit_address" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="2" required></textarea>
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
                 <input type="email" name="email" id="edit_email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
                 <input type="tel" name="phone" id="edit_phone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                <select name="industry" id="edit_industry" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">Select Industry</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Education">Education</option>
+                    <option value="Retail">Retail</option>
+                    <option value="Manufacturing">Manufacturing</option>
+                    <option value="Other">Other</option>
+                </select>
             </div>
             
             <div class="flex space-x-3 pt-4">
@@ -211,7 +248,7 @@
 </div>
 
 <!-- Delete Company Confirmation Modal -->
-<div id="deleteCompanyModal" class="fixed inset-0 z-50 items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+<div id="deleteCompanyModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
         <div class="p-6">
             <div class="flex items-center mb-4">
@@ -232,14 +269,19 @@
                 </p>
             </div>
             
-            <div class="flex space-x-3">
-                <button onclick="confirmDeleteCompany()" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
-                    Yes, Delete Company
-                </button>
-                <button onclick="closeModal('deleteCompanyModal')" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
-                    Cancel
-                </button>
-            </div>
+            <form id="deleteCompanyForm" action="{{ route('companies.destroy', 0) }}" method="POST">
+                @csrf
+                @method('DELETE')
+                
+                <div class="flex space-x-3">
+                    <button type="submit" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                        Yes, Delete Company
+                    </button>
+                    <button type="button" onclick="closeModal('deleteCompanyModal')" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -263,111 +305,81 @@ function closeModal(modalId) {
     }
 }
 
-// Form submission
-document.getElementById('addCompanyForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch('/companies', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeModal('addCompanyModal');
-            location.reload();
-        } else {
-            alert('Error adding company: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error adding company');
-    });
-});
+// Using standard Laravel form submission with flash messages
+// Form has action="{{ route('companies.store') }}" method="POST" already set
 
 // Edit Company Functions
 function editCompany(companyId) {
-    fetch(`/companies/${companyId}`)
-    .then(response => response.json())
-    .then(company => {
-        document.getElementById('edit_company_id').value = company.id;
-        document.getElementById('edit_name').value = company.name;
-        document.getElementById('edit_address').value = company.address;
-        document.getElementById('edit_email').value = company.email;
-        document.getElementById('edit_phone').value = company.phone;
-        openModal('editCompanyModal');
+    fetch(`/companies/${companyId}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.id) {
+            document.getElementById('edit_company_id').value = data.id;
+            document.getElementById('edit_name').value = data.name || '';
+            document.getElementById('edit_email').value = data.email || '';
+            document.getElementById('edit_phone').value = data.phone || '';
+            
+            // Set industry if available
+            if (data.industry) {
+                document.getElementById('edit_industry').value = data.industry;
+            }
+            
+            // Only set address if the field exists and data has address
+            const addressField = document.getElementById('edit_address');
+            if (addressField && data.address) {
+                addressField.value = data.address;
+            }
+            
+            // Update the form action URL with the correct ID
+            const form = document.getElementById('editCompanyForm');
+            form.action = form.action.replace(/\/0$/, `/${data.id}`);
+            
+            openModal('editCompanyModal');
+        } else {
+            console.error('Error: Could not load company data');
+            window.location.reload(); // Reload to show any potential flash error messages
+        }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error loading company data');
+        window.location.reload(); // Reload to show any potential flash error messages
     });
 }
 
-// Edit form submission
-document.getElementById('editCompanyForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
+// Using Laravel flash messages instead of client-side notifications
+</script>
+
+<!-- Using standard Laravel form submission -->
+
+<script>
+// Using standard Laravel form submission with flash messages
+// Form has action="{{ route('companies.update', 0) }}" method="POST" with @csrf and @method('PUT')
+
+// Update company form action before submission
+document.getElementById('editCompanyForm').addEventListener('submit', function() {
     const companyId = document.getElementById('edit_company_id').value;
-    const formData = new FormData(this);
-    
-    fetch(`/companies/${companyId}`, {
-        method: 'PUT',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeModal('editCompanyModal');
-            location.reload();
-        } else {
-            alert('Error updating company: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error updating company');
-    });
+    this.action = this.action.replace(/\/\d+$/, `/${companyId}`);
+    // Form will submit naturally - no preventDefault()
 });
 
 // Delete Company Function
-let companyToDelete = null;
-
 function deleteCompany(companyId) {
-    companyToDelete = companyId;
+    // Set the form action with the correct company ID
+    const form = document.getElementById('deleteCompanyForm');
+    form.action = form.action.replace(/\/\d+$/, `/${companyId}`);
+    
+    // Show the modal
     openModal('deleteCompanyModal');
-}
-
-function confirmDeleteCompany() {
-    if (companyToDelete) {
-        fetch(`/companies/${companyToDelete}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                closeModal('deleteCompanyModal');
-                location.reload();
-            } else {
-                alert('Error deleting company: ' + (data.message || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error deleting company');
-        });
-    }
 }
 </script>
 @endsection

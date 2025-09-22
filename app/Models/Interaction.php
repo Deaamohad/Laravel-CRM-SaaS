@@ -14,7 +14,6 @@ class Interaction extends Model
         'notes',
         'company_id',
         'user_id',
-        'contact_id',
         'deal_id',
         'interaction_date'
     ];
@@ -29,10 +28,7 @@ class Interaction extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function contact()
-    {
-        return $this->belongsTo(Contact::class);
-    }
+    // Contact relation removed
 
     public function deal()
     {

@@ -36,13 +36,68 @@ Route::middleware('auth:sanctum')->group(function () {
         }
         
         return response()->json([
-            'companies' => \App\Models\Company::count(),
-            'deals' => \App\Models\Deal::count(),
-            'interactions' => \App\Models\Interaction::count(),
+            'companies' => \App\Models\Company::where('id', $user->company_id)->count(),
+            'deals' => \App\Models\Deal::where('company_id', $user->company_id)->count(),
+            'interactions' => \App\Models\Interaction::where('company_id', $user->company_id)->count(),
             'users' => \App\Models\User::where('company_id', $user->company_id)->count(),
-            'total_deal_value' => \App\Models\Deal::sum('value'),
-            'recent_companies' => \App\Models\Company::latest()->take(5)->get(),
-            'recent_deals' => \App\Models\Deal::latest()->take(5)->get(),
+            'total_deal_value' => \App\Models\Deal::where('company_id', $user->company_id)->sum('value'),
+            'recent_companies' => \App\Models\Company::where('id', $user->company_id)->latest()->take(5)->get(),
+            'recent_deals' => \App\Models\Deal::where('company_id', $user->company_id)->latest()->take(5)->get(),
+        ]);
+    });
+    
+    // Dashboard Recent Activities API
+    Route::get('recent-activities', function () {
+        $user = Auth::user();
+        if (!$user || !$user->company_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        $recentInteractions = \App\Models\Interaction::where('company_id', $user->company_id)
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(function ($interaction) {
+                return [
+                    'id' => $interaction->id,
+                    'type' => $interaction->type,
+                    'notes' => $interaction->notes,
+                    'time_ago' => $interaction->created_at->diffForHumans()
+                ];
+            });
+            
+        return response()->json([
+            'activities' => $recentInteractions
+        ]);
+    });
+    
+    // Dashboard Stats API
+    Route::get('dashboard-stats', function () {
+        $user = Auth::user();
+        if (!$user || !$user->company_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        // Calculate stats similar to the dashboard controller
+        $companyId = $user->company_id;
+        
+        $totalCompanies = \App\Models\Company::where('id', $companyId)->count();
+        $totalDeals = \App\Models\Deal::where('company_id', $companyId)->count();
+        $totalRevenue = \App\Models\Deal::where('company_id', $companyId)->sum('value');
+        
+        // Simple conversion rate calculation
+        $wonDeals = \App\Models\Deal::where('company_id', $companyId)
+            ->where('stage', 'closed-won')
+            ->count();
+        $conversionRate = $totalDeals > 0 ? round(($wonDeals / $totalDeals) * 100, 1) : 0;
+        
+        return response()->json([
+            'stats' => [
+                'total_companies' => $totalCompanies,
+                'total_deals' => $totalDeals,
+                'total_revenue' => number_format($totalRevenue),
+                'conversion_rate' => $conversionRate
+            ]
         ]);
     });
 });

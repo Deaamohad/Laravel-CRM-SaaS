@@ -22,6 +22,17 @@ class Deal extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+    
+    /**
+     * The "booted" method of the model.
+     * Apply a default ordering to all queries
+     */
+    protected static function booted()
+    {
+        static::addGlobalScope('order', function ($query) {
+            $query->latest('created_at');
+        });
+    }
 
     public function company()
     {

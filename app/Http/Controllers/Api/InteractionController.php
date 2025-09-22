@@ -13,7 +13,18 @@ class InteractionController extends Controller
      */
     public function index()
     {
-        $interactions = Interaction::with(['company', 'deal'])->latest()->paginate(15);
+        $user = \Illuminate\Support\Facades\Auth::user();
+        
+        if (!$user || !$user->company_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        // Only show interactions from the user's company
+        $interactions = Interaction::with(['company', 'deal'])
+            ->where('company_id', $user->company_id)
+            ->latest()
+            ->paginate(15);
+            
         return response()->json($interactions);
     }
 

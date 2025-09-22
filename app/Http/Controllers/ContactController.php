@@ -14,28 +14,14 @@ class ContactController extends Controller
      */
     public function index()
     {
-        // Get the current user's company ID
-        $companyId = Auth::user()->company_id;
-        
-        // Filter contacts by the user's company
+        // Get all contacts without filtering by company
         $contacts = Contact::with(['company', 'user'])
-            ->whereHas('company', function ($query) use ($companyId) {
-                $query->where('id', $companyId);
-            })
             ->paginate(10);
             
-        // Only show companies that belong to the user's company (should be just one)
-        $companies = Company::where('id', $companyId)->get();
+        // Show all companies
+        $companies = Company::all();
         
         return view('contacts.index', compact('contacts', 'companies'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -52,13 +38,16 @@ class ContactController extends Controller
             'position' => 'nullable|string|max:255',
             'notes' => 'nullable|string|max:1000'
         ]);
+        
+        $user = Auth::user();
 
         $data = $request->only(['first_name', 'last_name', 'company_id', 'email', 'phone', 'position', 'notes']);
-        $data['user_id'] = Auth::id(); // Assign the authenticated user
+        $data['user_id'] = $user->id; // Assign the authenticated user
 
         Contact::create($data);
 
-        return response()->json(['success' => true, 'message' => 'Contact created successfully']);
+        return redirect()->route('contacts.index')
+            ->with('success', 'Contact created successfully');
     }
 
     /**
@@ -66,8 +55,7 @@ class ContactController extends Controller
      */
     public function show(Contact $contact)
     {
-        $contact->load(['company', 'user', 'interactions']);
-        return response()->json($contact);
+        return view('contacts.show', compact('contact'));
     }
 
     /**
@@ -75,7 +63,8 @@ class ContactController extends Controller
      */
     public function edit(Contact $contact)
     {
-        //
+        $companies = Company::all();
+        return view('contacts.edit', compact('contact', 'companies'));
     }
 
     /**
@@ -93,12 +82,12 @@ class ContactController extends Controller
             'notes' => 'nullable|string|max:1000'
         ]);
 
-        $data = $request->only(['first_name', 'last_name', 'company_id', 'email', 'phone', 'position', 'notes']);
-        // Don't update user_id - keep original creator
+        $contact->update($request->only([
+            'first_name', 'last_name', 'company_id', 'email', 'phone', 'position', 'notes'
+        ]));
 
-        $contact->update($data);
-
-        return response()->json(['success' => true, 'message' => 'Contact updated successfully']);
+        return redirect()->route('contacts.show', $contact->id)
+            ->with('success', 'Contact updated successfully');
     }
 
     /**
@@ -108,6 +97,7 @@ class ContactController extends Controller
     {
         $contact->delete();
         
-        return response()->json(['success' => true, 'message' => 'Contact deleted successfully']);
+        return redirect()->route('contacts.index')
+            ->with('success', 'Contact deleted successfully');
     }
 }

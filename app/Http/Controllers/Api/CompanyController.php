@@ -28,11 +28,8 @@ class CompanyController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
         
-        // In a real multi-tenant app, users would only see their own company
-        // For demo purposes, we'll show all companies but in production this would be:
-        // $companies = Company::where('id', $user->company_id)->paginate(15);
-        
-        $companies = Company::latest()->paginate(15);
+        // Users should only see their own company
+        $companies = Company::where('id', $user->company_id)->latest()->paginate(15);
         
         return response()->json([
             'success' => true,

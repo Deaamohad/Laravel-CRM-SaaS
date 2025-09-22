@@ -31,10 +31,30 @@
         </div>
     </div>
 
-    <!-- Search and Filter Component -->
-    <form method="GET" action="{{ route('interactions.index') }}">
-        @include('components.search-filter', ['type' => 'interactions'])
-    </form>
+    <!-- Flash Messages -->
+    @if (session('success'))
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            {{ session('success') }}
+        </div>
+    </div>
+    @endif
+
+    @if (session('error'))
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded shadow-sm">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            {{ session('error') }}
+        </div>
+    </div>
+    @endif
+
+
 
     <!-- Interactions Table -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -148,7 +168,7 @@
             </div>
         </div>
         
-        <form id="logInteractionForm" class="p-6 space-y-4">
+        <form id="logInteractionForm" action="{{ route('interactions.store') }}" method="POST" class="p-6 space-y-4">
             @csrf
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Interaction Type *</label>
@@ -161,29 +181,41 @@
                     <option value="follow-up">Follow-up</option>
                     <option value="other">Other</option>
                 </select>
+                @error('type')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Company *</label>
                 <select name="company_id" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                     <option value="">Select Company</option>
-                    @php
-                        $companies = \App\Models\Company::latest()->take(20)->get();
-                    @endphp
                     @foreach($companies as $company)
                         <option value="{{ $company->id }}">{{ $company->name }}</option>
                     @endforeach
                 </select>
+                @error('company_id')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
+
+            <!-- Add a hidden field for contact_id with null value -->
+            <input type="hidden" name="contact_id" value="">
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
                 <textarea name="notes" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Add interaction details..."></textarea>
+                @error('notes')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
                 <input type="datetime-local" name="interaction_date" value="{{ now()->format('Y-m-d\TH:i') }}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                @error('interaction_date')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
             
             <div class="flex space-x-3 pt-4">
@@ -194,13 +226,24 @@
                     Cancel
                 </button>
             </div>
+            
+            <!-- Display any form errors -->
+            @if ($errors->any())
+                <div class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg">
+                    <ul class="list-disc pl-4">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
         </form>
     </div>
 </div>
 
 <!-- Edit Interaction Modal -->
-<div id="editInteractionModal" class="fixed inset-0 z-50 items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 transform transition-all my-8 max-h-screen overflow-y-auto">
+<div id="editInteractionModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 transform transition-all max-h-screen overflow-y-auto pt-0 mt-8">
         <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-2xl p-6">
             <div class="flex justify-between items-center">
                 <h3 class="text-xl font-bold text-white">Edit Interaction</h3>
@@ -212,8 +255,10 @@
             </div>
         </div>
         
-        <form id="editInteractionForm" class="px-6 pb-6 space-y-4">
+        <form id="editInteractionForm" class="px-6 pb-6 space-y-4 pt-4" action="{{ route('interactions.update', 0) }}" method="POST">
             <input type="hidden" name="interaction_id" id="edit_interaction_id">
+            @csrf
+            @method('PUT')
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
@@ -221,7 +266,9 @@
                     <option value="call">Phone Call</option>
                     <option value="email">Email</option>
                     <option value="meeting">Meeting</option>
-                    <option value="note">Note</option>
+                    <option value="demo">Demo</option>
+                    <option value="follow-up">Follow-up</option>
+                    <option value="other">Other</option>
                 </select>
             </div>
             
@@ -229,9 +276,6 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Company</label>
                 <select name="company_id" id="edit_company_id" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                     <option value="">Select Company</option>
-                    @php
-                        $companies = \App\Models\Company::latest()->take(20)->get();
-                    @endphp
                     @foreach($companies as $company)
                         <option value="{{ $company->id }}">{{ $company->name }}</option>
                     @endforeach
@@ -239,8 +283,8 @@
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                <textarea name="description" id="edit_description" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Add interaction details..." required></textarea>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                <textarea name="notes" id="edit_notes" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Add interaction details..." required></textarea>
             </div>
             
             <div>
@@ -261,7 +305,7 @@
 </div>
 
 <!-- Delete Interaction Confirmation Modal -->
-<div id="deleteInteractionModal" class="fixed inset-0 z-50 items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+<div id="deleteInteractionModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
         <div class="p-6">
             <div class="flex items-center mb-4">
@@ -282,14 +326,19 @@
                 </p>
             </div>
             
-            <div class="flex space-x-3">
-                <button onclick="confirmDeleteInteraction()" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
-                    Yes, Delete Interaction
-                </button>
-                <button onclick="closeModal('deleteInteractionModal')" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
-                    Cancel
-                </button>
-            </div>
+            <form id="deleteInteractionForm" action="{{ route('interactions.destroy', 0) }}" method="POST">
+                @csrf
+                @method('DELETE')
+                
+                <div class="flex space-x-3">
+                    <button type="button" onclick="confirmDeleteInteraction()" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                        Yes, Delete Interaction
+                    </button>
+                    <button type="button" onclick="closeModal('deleteInteractionModal')" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -313,115 +362,76 @@ function closeModal(modalId) {
     }
 }
 
-// Form submission
-document.getElementById('logInteractionForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch('/interactions', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeModal('logInteractionModal');
-            location.reload();
-        } else {
-            alert('Error logging interaction: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error logging interaction');
-    });
-});
+// Using standard Laravel form submission with flash messages
+// Form already has action="{{ route('interactions.store') }}" method="POST" set
 
 // Edit Interaction Functions
 function editInteraction(interactionId) {
-    fetch(`/interactions/${interactionId}`)
-    .then(response => response.json())
+    fetch(`/interactions/${interactionId}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(interaction => {
         document.getElementById('edit_interaction_id').value = interaction.id;
         document.getElementById('edit_type').value = interaction.type;
         document.getElementById('edit_company_id').value = interaction.company_id;
-        document.getElementById('edit_description').value = interaction.description || '';
+        document.getElementById('edit_notes').value = interaction.notes || ''; // Changed from description to notes
         
         // Format datetime for input
         const date = new Date(interaction.interaction_date);
         const formattedDate = date.toISOString().slice(0, 16);
         document.getElementById('edit_interaction_date').value = formattedDate;
         
+        // Update the form action URL with the correct ID
+        const form = document.getElementById('editInteractionForm');
+        form.action = form.action.replace(/\/0$/, `/${interaction.id}`);
+        
         openModal('editInteractionModal');
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error loading interaction data');
+        alert('Error loading interaction data: ' + error.message);
     });
 }
 
-// Edit form submission
+// Update form action before submitting
 document.getElementById('editInteractionForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
     const interactionId = document.getElementById('edit_interaction_id').value;
-    const formData = new FormData(this);
-    
-    fetch(`/interactions/${interactionId}`, {
-        method: 'PUT',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeModal('editInteractionModal');
-            location.reload();
-        } else {
-            alert('Error updating interaction: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error updating interaction');
-    });
+    this.action = this.action.replace(/\/\d+$/, `/${interactionId}`);
+    // Form will submit normally
 });
 
-// Delete Interaction Function
-let interactionToDelete = null;
+// Using standard Laravel form submission with flash messages
+// The form has been updated with action="{{ route('interactions.update', 0) }}" method="POST"
+// with @csrf and @method('PUT') directives
 
+// Delete Interaction Function
 function deleteInteraction(interactionId) {
-    interactionToDelete = interactionId;
+    // Set the form action with the correct interaction ID
+    const form = document.getElementById('deleteInteractionForm');
+    form.action = form.action.replace(/\/\d+$/, `/${interactionId}`);
+    
+    // Store the interaction ID in a variable for use by confirmDeleteInteraction
+    window.currentInteractionId = interactionId;
+    
+    // Show the modal
     openModal('deleteInteractionModal');
 }
 
+// Function to handle deletion of an interaction
 function confirmDeleteInteraction() {
-    if (interactionToDelete) {
-        fetch(`/interactions/${interactionToDelete}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                closeModal('deleteInteractionModal');
-                location.reload();
-            } else {
-                alert('Error deleting interaction: ' + (data.message || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error deleting interaction');
-        });
+    if (window.currentInteractionId) {
+        document.getElementById('deleteInteractionForm').submit();
+    } else {
+        console.error('No interaction selected for deletion');
     }
 }
 </script>

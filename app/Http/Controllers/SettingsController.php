@@ -29,14 +29,17 @@ class SettingsController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'company' => 'required|string|max:255',
-            'timezone' => 'required|string|max:255'
+            'company' => 'required|string|max:255'
         ]);
 
         // For demo purposes, we'll just return success
         // In a real app, you'd update the user model
         
-        return response()->json(['success' => true, 'message' => 'Profile updated successfully']);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Profile updated successfully']);
+        }
+        
+        return redirect()->route('settings.index')->with('success', 'Profile updated successfully');
     }
 
     public function resetData()

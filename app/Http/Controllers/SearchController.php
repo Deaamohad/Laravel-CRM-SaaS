@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
-use App\Models\Contact;
 use App\Models\Deal;
 use App\Models\Interaction;
 use Illuminate\Http\Request;
@@ -35,37 +34,14 @@ class SearchController extends Controller
         $companies = Company::where(function($q) use ($query) {
             $q->where('name', 'LIKE', "%{$query}%")
               ->orWhere('email', 'LIKE', "%{$query}%");
-        })->limit(5)->get(['id', 'name', 'email', 'phone', 'created_at']);
-
-        // Search contacts - find contacts created by this user OR in their company
-        $contacts = Contact::where(function($q) use ($user) {
-                $q->where('user_id', $user->id) // Contacts created by this user
-                  ->orWhere('company_id', $user->company_id); // OR contacts in their company
-            })
-            ->where(function($q) use ($query) {
-                $q->where('first_name', 'LIKE', "%{$query}%")
-                  ->orWhere('last_name', 'LIKE', "%{$query}%")
-                  ->orWhere('email', 'LIKE', "%{$query}%")
-                  ->orWhere('position', 'LIKE', "%{$query}%");
-            })
-            ->with('company:id,name')
-            ->limit(5)
-            ->get(['id', 'first_name', 'last_name', 'email', 'position', 'company_id', 'created_at']);                // Search deals - find deals created by this user OR in their company
-        $deals = Deal::where(function($q) use ($user) {
-                $q->where('user_id', $user->id) // Deals created by this user
-                  ->orWhere('company_id', $user->company_id); // OR deals in their company
-            })
-            ->where(function($q) use ($query) {
+        })->limit(5)->get(['id', 'name', 'email', 'phone', 'created_at']);                // Search deals - find all deals matching the query
+        $deals = Deal::where(function($q) use ($query) {
                 $q->where('title', 'LIKE', "%{$query}%");
             })
             ->get(['id', 'title', 'value', 'stage', 'company_id', 'created_at']);
 
-        // Search interactions - find interactions created by this user OR in their company
-        $interactions = Interaction::where(function($q) use ($user) {
-                $q->where('user_id', $user->id) // Interactions created by this user
-                  ->orWhere('company_id', $user->company_id); // OR interactions in their company
-            })
-            ->where(function($q) use ($query) {
+        // Search interactions - find all interactions matching the query
+        $interactions = Interaction::where(function($q) use ($query) {
                 $q->where('type', 'LIKE', "%{$query}%")
                   ->orWhere('notes', 'LIKE', "%{$query}%");
             })
@@ -79,11 +55,10 @@ class SearchController extends Controller
             ->limit($request->wantsJson() ? 5 : 20)
             ->get(['id', 'type', 'notes', 'interaction_date', 'company_id', 'created_at']);
 
-        $total = $companies->count() + $contacts->count() + $deals->count() + $interactions->count();
+        $total = $companies->count() + $deals->count() + $interactions->count();
 
         $results = [
             'companies' => $companies,
-            'contacts' => $contacts,
             'deals' => $deals,
             'interactions' => $interactions,
             'total' => $total,
@@ -100,7 +75,7 @@ class SearchController extends Controller
     public function companies(Request $request)
     {
         $user = Auth::user();
-        if (!$user || !$user->company_id) {
+        if (!$user) {
             return redirect()->route('login');
         }
 
@@ -145,14 +120,11 @@ class SearchController extends Controller
     public function deals(Request $request)
     {
         $user = Auth::user();
-        if (!$user || !$user->company_id) {
+        if (!$user) {
             return redirect()->route('login');
         }
 
-        $query = Deal::where(function($q) use ($user) {
-            $q->where('user_id', $user->id) // Deals created by this user
-              ->orWhere('company_id', $user->company_id); // OR deals in their company
-        })->with('company');
+        $query = Deal::with('company');
 
         // Search by title
         if ($search = $request->get('search')) {
@@ -203,14 +175,11 @@ class SearchController extends Controller
     public function interactions(Request $request)
     {
         $user = Auth::user();
-        if (!$user || !$user->company_id) {
+        if (!$user) {
             return redirect()->route('login');
         }
 
-        $query = Interaction::where(function($q) use ($user) {
-            $q->where('user_id', $user->id) // Interactions created by this user
-              ->orWhere('company_id', $user->company_id); // OR interactions in their company
-        })->with('company');
+        $query = Interaction::with('company');
 
         // Search by type, notes
         if ($search = $request->get('search')) {
@@ -253,57 +222,5 @@ class SearchController extends Controller
         return view('interactions.index', compact('interactions', 'types', 'companies'));
     }
 
-    public function contacts(Request $request)
-    {
-        $user = Auth::user();
-        if (!$user || !$user->company_id) {
-            return redirect()->route('login');
-        }
 
-        $query = Contact::where(function($q) use ($user) {
-            $q->where('user_id', $user->id) // Contacts created by this user
-              ->orWhere('company_id', $user->company_id); // OR contacts in their company
-        })->with(['company', 'user']);
-
-        // Search by name, email, position
-        if ($search = $request->get('search')) {
-            $query->where(function($q) use ($search) {
-                $q->where('first_name', 'LIKE', "%{$search}%")
-                  ->orWhere('last_name', 'LIKE', "%{$search}%")
-                  ->orWhere('email', 'LIKE', "%{$search}%")
-                  ->orWhere('position', 'LIKE', "%{$search}%");
-            });
-        }
-
-        // Filter by company
-        if ($companyId = $request->get('company_id')) {
-            $query->where('company_id', $companyId);
-        }
-
-        // Filter by position
-        if ($position = $request->get('position')) {
-            $query->where('position', 'LIKE', "%{$position}%");
-        }
-
-        // Filter by date range
-        if ($from = $request->get('from_date')) {
-            $query->whereDate('created_at', '>=', $from);
-        }
-        if ($to = $request->get('to_date')) {
-            $query->whereDate('created_at', '<=', $to);
-        }
-
-        // Sort options
-        $sort = $request->get('sort', 'created_at');
-        $direction = $request->get('direction', 'desc');
-        $query->orderBy($sort, $direction);
-
-        $contacts = $query->paginate(10);
-
-        // Get data for filter dropdowns
-        $companies = Company::orderBy('name')
-            ->get(['id', 'name']);
-
-        return view('contacts.index', compact('contacts', 'companies'));
-    }
 }

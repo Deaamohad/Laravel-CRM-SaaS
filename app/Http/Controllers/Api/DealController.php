@@ -14,7 +14,18 @@ class DealController extends Controller
      */
     public function index()
     {
-        $deals = Deal::with('company')->latest()->paginate(15);
+        $user = \Illuminate\Support\Facades\Auth::user();
+        
+        if (!$user || !$user->company_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        // Only show deals from the user's company
+        $deals = Deal::with('company')
+            ->where('company_id', $user->company_id)
+            ->latest()
+            ->paginate(15);
+            
         return response()->json($deals);
     }
 

@@ -28,24 +28,46 @@ class TenantScope
         $companyId = $user->company_id;
 
         // Check if the user is trying to access a specific resource
-        if ($request->route('company') && $request->route('company')->id !== $companyId) {
-            // Don't allow access to other companies
-            abort(403, 'Unauthorized action.');
+        if ($request->route('company')) {
+            $company = $request->route('company');
+            
+            // Allow access if:
+            // 1. User created the company, OR
+            // 2. User belongs to the company
+            if (($company->user_id !== null && $company->user_id !== $user->id) && 
+                ($companyId !== null && $company->id !== $companyId)) {
+                abort(403, 'Unauthorized action.');
+            }
         }
 
-        if ($request->route('deal') && $request->route('deal')->company_id !== $companyId) {
-            // Don't allow access to deals from other companies
-            abort(403, 'Unauthorized action.');
+        if ($request->route('deal')) {
+            $deal = $request->route('deal');
+            
+            // Allow access if:
+            // 1. User created the deal, OR
+            // 2. User belongs to the company that owns the deal
+            if (($deal->user_id !== null && $deal->user_id !== $user->id) && 
+                ($companyId !== null && $deal->company_id !== $companyId)) {
+                abort(403, 'Unauthorized action.');
+            }
         }
 
-        if ($request->route('contact') && $request->route('contact')->company_id !== $companyId) {
+        if ($request->route('contact') && $request->route('contact')->company_id !== null && 
+            $companyId !== null && $request->route('contact')->company_id !== $companyId) {
             // Don't allow access to contacts from other companies
             abort(403, 'Unauthorized action.');
         }
 
-        if ($request->route('interaction') && $request->route('interaction')->company_id !== $companyId) {
-            // Don't allow access to interactions from other companies
-            abort(403, 'Unauthorized action.');
+        if ($request->route('interaction')) {
+            $interaction = $request->route('interaction');
+            
+            // Allow access if:
+            // 1. User created the interaction, OR
+            // 2. User belongs to the company that owns the interaction
+            if (($interaction->user_id !== null && $interaction->user_id !== $user->id) && 
+                ($companyId !== null && $interaction->company_id !== $companyId)) {
+                abort(403, 'Unauthorized action.');
+            }
         }
 
         return $next($request);

@@ -6,11 +6,9 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CompaniesController;
-use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DealsController;
 use App\Http\Controllers\InteractionsController;
 use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ApiManagementController;
 
 // Public routes (available to guests)
@@ -65,10 +63,9 @@ Route::middleware('auth')->group(function () {
     
     // CRM Pages
     Route::get('companies', [CompaniesController::class, 'index'])->name('companies.index');
-    Route::get('contacts', [ContactController::class, 'index'])->name('contacts.index');
+    Route::get('all-companies', [DashboardController::class, 'allCompanies'])->name('companies.all');
     Route::get('deals', [DealsController::class, 'index'])->name('deals.index');
     Route::get('interactions', [InteractionsController::class, 'index'])->name('interactions.index');
-    Route::get('reports', [DashboardController::class, 'reports'])->name('reports.index');
     Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::get('api-management', [ApiManagementController::class, 'index'])->name('api.management');
     Route::get('api-guide', fn() => view('api.integration-guide'))->name('api.guide');
@@ -85,12 +82,6 @@ Route::middleware('auth')->group(function () {
     Route::put('companies/{company}', [CompaniesController::class, 'update'])->name('companies.update');
     Route::delete('companies/{company}', [CompaniesController::class, 'destroy'])->name('companies.destroy');
 
-    // Contact CRUD Routes
-    Route::post('contacts', [ContactController::class, 'store'])->name('contacts.store');
-    Route::get('contacts/{contact}', [ContactController::class, 'show'])->name('contacts.show');
-    Route::put('contacts/{contact}', [ContactController::class, 'update'])->name('contacts.update');
-    Route::delete('contacts/{contact}', [ContactController::class, 'destroy'])->name('contacts.destroy');
-
     // Deal CRUD Routes
     Route::post('deals', [DealsController::class, 'store'])->name('deals.store');
     Route::post('deals/quick-create', [DashboardController::class, 'quickCreateDeal'])->name('deals.quick-create');
@@ -104,12 +95,4 @@ Route::middleware('auth')->group(function () {
     Route::get('interactions/{interaction}', [InteractionsController::class, 'show'])->name('interactions.show');
     Route::put('interactions/{interaction}', [InteractionsController::class, 'update'])->name('interactions.update');
     Route::delete('interactions/{interaction}', [InteractionsController::class, 'destroy'])->name('interactions.destroy');
-
-    // Search Routes
-    Route::get('search/global', [SearchController::class, 'global'])->name('search.global');
-    Route::get('search/companies', [SearchController::class, 'companies'])->name('search.companies');
-    Route::get('search/contacts', [SearchController::class, 'contacts'])->name('search.contacts');
-    Route::get('search/deals', [SearchController::class, 'deals'])->name('search.deals');
-    Route::get('search/interactions', [SearchController::class, 'interactions'])->name('search.interactions');
 });
-

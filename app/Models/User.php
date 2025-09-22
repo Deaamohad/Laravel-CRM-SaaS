@@ -56,14 +56,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Get contacts created by this user.
-     */
-    public function contacts()
-    {
-        return $this->hasMany(Contact::class);
-    }
-
-    /**
      * Get deals created by this user.
      */
     public function deals()

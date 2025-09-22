@@ -109,17 +109,6 @@
     </div>
 </section>
 
-<section class="bg-gray-50 py-16">
-    <div class="max-w-6xl mx-auto text-center px-4">
-        <p class="text-gray-600 text-lg mb-8 font-medium">Trusted by leading companies worldwide</p>
-        <div class="flex flex-wrap justify-center items-center gap-8">
-            <div class="bg-gradient-to-r from-blue-500 to-blue-600 shadow-lg px-8 py-4 rounded-xl font-bold text-white hover:shadow-xl hover:scale-105 transition-all duration-300">Company A</div>
-            <div class="bg-gradient-to-r from-purple-500 to-purple-600 shadow-lg px-8 py-4 rounded-xl font-bold text-white hover:shadow-xl hover:scale-105 transition-all duration-300">Company B</div>
-            <div class="bg-gradient-to-r from-green-500 to-green-600 shadow-lg px-8 py-4 rounded-xl font-bold text-white hover:shadow-xl hover:scale-105 transition-all duration-300">Company C</div>
-            <div class="bg-gradient-to-r from-orange-500 to-orange-600 shadow-lg px-8 py-4 rounded-xl font-bold text-white hover:shadow-xl hover:scale-105 transition-all duration-300">Company D</div>
-        </div>
-    </div>
-</section>
 
 <section id="pricing-cards" class="py-20 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4">

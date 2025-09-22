@@ -9,49 +9,119 @@ class CompaniesController extends Controller
 {
     public function index()
     {
-        // Filter companies by the logged-in user's company_id
+        // Get the current user
         $user = \Illuminate\Support\Facades\Auth::user();
-        $companies = Company::where('id', $user->company_id)->paginate(10);
+        
+        // Get companies associated with the user:
+        // 1. Companies created by the user
+        // 2. The company the user belongs to
+        // 3. Companies that have deals created by the user
+        // 4. Companies that have interactions created by the user
+        $query = Company::where(function($q) use ($user) {
+            // Companies user created or belongs to
+            if ($user->company_id) {
+                $q->where('id', $user->company_id)
+                  ->orWhere('user_id', $user->id);
+            } else {
+                $q->where('user_id', $user->id);
+            }
+        })
+        ->orWhereHas('deals', function($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+        ->orWhereHas('interactions', function($q) use ($user) {
+            $q->where('user_id', $user->id);
+        });
+        
+        // Get distinct companies and paginate
+        $companies = $query->distinct()->paginate(10);
+        
         return view('companies.index', compact('companies'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $validationRules = [
+            'name' => 'required|string|max:50',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
-            'address' => 'required|string|max:500'
-        ]);
+            'industry' => 'nullable|string|max:255',
+        ];
+        
+        // Contact validation removed
+        
+        $request->validate($validationRules);
 
-        Company::create($request->all());
+        // Get the current user
+        $user = \Illuminate\Support\Facades\Auth::user();
+        
+        // Create the company with all the valid fields
+        $companyData = $request->only(['name', 'email', 'phone', 'industry']);
+        
+        // Add the current user as the creator of the company
+        $companyData['user_id'] = $user->id;
+        
+        // Create a new company record
+        $company = Company::create($companyData);
 
-        return response()->json(['success' => true, 'message' => 'Company created successfully']);
+        // Contact creation code removed
+
+        return redirect()->route('companies.index')
+            ->with('success', 'Company created successfully');
     }
 
     public function show(Company $company)
     {
-        return response()->json($company);
+        // Return JSON if it's an AJAX request
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json($company);
+        }
+        
+        // Load interactions related to this company
+        $interactions = $company->interactions()
+            ->orderBy('interaction_date', 'desc')
+            ->get();
+            
+        // Load deals related to this company
+        $deals = $company->deals()
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return view('companies.show', compact('company', 'interactions', 'deals'));
     }
 
     public function update(Request $request, Company $company)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:50',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
-            'address' => 'required|string|max:500'
+            'industry' => 'nullable|string|max:255'
         ]);
 
         $company->update($request->all());
 
-        return response()->json(['success' => true, 'message' => 'Company updated successfully']);
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true, 
+                'message' => 'Company updated successfully',
+                'company' => $company
+            ]);
+        }
+
+        return redirect()->route('companies.index')
+            ->with('success', 'Company updated successfully');
     }
 
     public function destroy(Company $company)
     {
         $company->delete();
         
-        return response()->json(['success' => true, 'message' => 'Company deleted successfully']);
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Company deleted successfully']);
+        }
+        
+        return redirect()->route('companies.index')
+            ->with('success', 'Company deleted successfully');
     }
 }
