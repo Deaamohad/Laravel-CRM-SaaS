@@ -11,6 +11,24 @@
     @include('components.guest-header')
     
     <main class="flex-1">
+        @if(session('success'))
+            <div class="container mx-auto px-4 pt-6">
+                <x-flash-message type="success" message="{{ session('success') }}" />
+            </div>
+        @endif
+        
+        @if(session('error'))
+            <div class="container mx-auto px-4 pt-6">
+                <x-flash-message type="error" message="{{ session('error') }}" />
+            </div>
+        @endif
+        
+        @if(session('status'))
+            <div class="container mx-auto px-4 pt-6">
+                <x-flash-message type="success" message="{{ session('status') }}" />
+            </div>
+        @endif
+        
         @yield('content')
     </main>
     

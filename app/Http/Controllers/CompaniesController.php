@@ -43,9 +43,11 @@ class CompaniesController extends Controller
     {
         $validationRules = [
             'name' => 'required|string|max:50',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
             'industry' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
         ];
         
         // Contact validation removed
@@ -56,7 +58,7 @@ class CompaniesController extends Controller
         $user = \Illuminate\Support\Facades\Auth::user();
         
         // Create the company with all the valid fields
-        $companyData = $request->only(['name', 'email', 'phone', 'industry']);
+        $companyData = $request->only(['name', 'email', 'phone', 'address', 'industry', 'notes']);
         
         // Add the current user as the creator of the company
         $companyData['user_id'] = $user->id;
@@ -89,14 +91,21 @@ class CompaniesController extends Controller
         
         return view('companies.show', compact('company', 'interactions', 'deals'));
     }
+    
+    public function edit(Company $company)
+    {
+        return view('companies.edit', compact('company'));
+    }
 
     public function update(Request $request, Company $company)
     {
         $request->validate([
             'name' => 'required|string|max:50',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'industry' => 'nullable|string|max:255'
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'industry' => 'nullable|string|max:255',
+            'notes' => 'nullable|string'
         ]);
 
         $company->update($request->all());
@@ -109,7 +118,7 @@ class CompaniesController extends Controller
             ]);
         }
 
-        return redirect()->route('companies.index')
+        return redirect()->route('companies.show', $company)
             ->with('success', 'Company updated successfully');
     }
 

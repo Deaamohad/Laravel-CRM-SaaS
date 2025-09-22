@@ -13,29 +13,7 @@
             Create Deal
         </button>
     </div>
-    
-    <!-- Flash Messages -->
-    @if (session('success'))
-    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm">
-        <div class="flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-            {{ session('success') }}
-        </div>
-    </div>
-    @endif
-
-    @if (session('error'))
-    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded shadow-sm">
-        <div class="flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            {{ session('error') }}
-        </div>
-    </div>
-    @endif
+    <!-- Flash Messages are handled in the layout -->
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
@@ -55,14 +33,14 @@
         
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center">
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Total Value</p>
+                    <p class="text-sm font-medium text-gray-600">Total Revenue</p>
                     <p class="text-2xl font-bold text-gray-900">${{ number_format($deals->sum('value'), 0) }}</p>
                 </div>
             </div>
@@ -91,7 +69,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($deals as $deal)
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location.href='{{ route('companies.show', $deal->company) }}'">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900">{{ $deal->title }}</div>
                         </td>
@@ -120,9 +98,15 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ $deal->created_at->format('M d, Y') }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button onclick="editDeal({{ $deal->id }})" class="text-blue-600 hover:text-blue-900 mr-3 cursor-pointer">Edit</button>
-                            <button onclick="deleteDeal({{ $deal->id }})" class="text-red-600 hover:text-red-900 cursor-pointer">Delete</button>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" onclick="event.stopPropagation()">
+                            <div class="flex space-x-2">
+                                <button onclick="editDeal({{ $deal->id }}, event)" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 rounded-md cursor-pointer transition-colors">
+                                    <span class="font-medium">Edit</span>
+                                </button>
+                                <button onclick="deleteDeal({{ $deal->id }}, event)" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 rounded-md cursor-pointer transition-colors">
+                                    <span class="font-medium">Delete</span>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -149,12 +133,12 @@
 </div>
 
 <!-- Create Deal Modal (reuse from dashboard but get fresh company list) -->
-<div id="createDealModal" class="fixed inset-0 z-50 items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+<div id="createDealModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
         <div class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-t-2xl p-6">
             <div class="flex justify-between items-center">
                 <h3 class="text-xl font-bold text-white">Create New Deal</h3>
-                <button onclick="closeModal('createDealModal')" class="text-white hover:text-gray-200">
+                <button onclick="closeModal('createDealModal')" class="text-white hover:text-gray-200 cursor-pointer">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -185,12 +169,29 @@
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Company *</label>
-                <select name="company_id" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    <option value="">Select Company</option>
-                    @foreach($companies as $company)
-                        <option value="{{ $company->id }}" {{ old('company_id') == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
-                    @endforeach
-                </select>
+                <div class="relative">
+                    <input type="text" id="company_search" placeholder="Search for a company..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <input type="hidden" id="company_id" name="company_id" required value="{{ old('company_id') }}">
+                    
+                    <div id="company_dropdown" class="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto">
+                        @foreach($companies as $company)
+                            <div 
+                                class="company-option p-3 cursor-pointer hover:bg-blue-50" 
+                                data-company-id="{{ $company->id }}"
+                                data-company-name="{{ $company->name }}"
+                            >
+                                <div class="font-medium">{{ $company->name }}</div>
+                                <div class="text-xs text-gray-600">{{ $company->address ?: 'No address' }}</div>
+                                <div class="text-xs text-gray-500 truncate">{{ Str::limit($company->notes, 40) ?: 'No notes' }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                
+                <div id="selected_company" class="mt-2 p-2 border border-green-200 rounded-lg bg-green-50 hidden">
+                    <div class="font-medium" id="selected_company_name"></div>
+                </div>
+                
                 @error('company_id')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
@@ -212,10 +213,10 @@
             </div>
             
             <div class="flex space-x-3 pt-4">
-                <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all cursor-pointer">
                     Create Deal
                 </button>
-                <button type="button" onclick="closeModal('createDealModal')" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                <button type="button" onclick="closeModal('createDealModal')" class="px-6 py-3 border cursor-pointer border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
                     Cancel
                 </button>
             </div>
@@ -229,7 +230,7 @@
         <div class="bg-gradient-to-r from-blue-600 to-green-600 rounded-t-2xl p-6">
             <div class="flex justify-between items-center">
                 <h3 class="text-xl font-bold text-white">Edit Deal</h3>
-                <button onclick="closeModal('editDealModal')" class="text-white hover:text-gray-200">
+                <button onclick="closeModal('editDealModal')" class="text-white hover:text-gray-200 cursor-pointer">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -257,12 +258,29 @@
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Company *</label>
-                <select name="company_id" id="edit_company_id" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    <option value="">Select Company</option>
-                    @foreach($companies as $company)
-                        <option value="{{ $company->id }}">{{ $company->name }}</option>
-                    @endforeach
-                </select>
+                <div class="relative">
+                    <input type="text" id="edit_company_search" placeholder="Search for a company..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <input type="hidden" id="edit_company_id" name="company_id" required>
+                    
+                    <div id="edit_company_dropdown" class="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto">
+                        @foreach($companies as $company)
+                            <div 
+                                class="edit-company-option p-3 cursor-pointer hover:bg-blue-50" 
+                                data-company-id="{{ $company->id }}"
+                                data-company-name="{{ $company->name }}"
+                            >
+                                <div class="font-medium">{{ $company->name }}</div>
+                                <div class="text-xs text-gray-600">{{ $company->address ?: 'No address' }}</div>
+                                <div class="text-xs text-gray-500 truncate">{{ Str::limit($company->notes, 40) ?: 'No notes' }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                
+                <div id="edit_selected_company" class="mt-2 p-2 border border-green-200 rounded-lg bg-green-50 hidden">
+                    <div class="font-medium" id="edit_selected_company_name"></div>
+                </div>
+                
                 @if(count($companies) == 0)
                     <p class="text-red-500 text-xs mt-1">No companies available. Please create a company first.</p>
                 @endif
@@ -286,10 +304,10 @@
             </div>
             
             <div class="flex space-x-3 pt-4">
-                <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-green-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-green-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all cursor-pointer">
                     Update Deal
                 </button>
-                <button type="button" onclick="closeModal('editDealModal')" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                <button type="button" onclick="closeModal('editDealModal')" class="px-6 py-3 border cursor-pointer border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
                     Cancel
                 </button>
             </div>
@@ -322,7 +340,12 @@ function closeModal(modalId) {
 // The form has action="{{ route('deals.store') }}" method="POST" already set
 
 // Edit Deal Functions
-function editDeal(dealId) {
+function editDeal(dealId, event) {
+    // Stop event propagation to prevent row click from firing
+    if (event) {
+        event.stopPropagation();
+    }
+    
     fetch(`/deals/${dealId}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
@@ -340,50 +363,31 @@ function editDeal(dealId) {
         document.getElementById('edit_title').value = deal.title;
         document.getElementById('edit_amount').value = deal.value; // Changed from amount to value
         
-        // Get the company select dropdown
-        const companySelect = document.getElementById('edit_company_id');
-        
-        // Clear existing options except the first one (Select Company)
-        while (companySelect.options.length > 1) {
-            companySelect.remove(1);
-        }
-        
-        // Check if company data is available in the deal object
+        // Populate company field in the custom dropdown
         if (deal.company && deal.company.id && deal.company.name) {
-            // Add the current company as an option
-            let optionExists = false;
+            // Set hidden input value
+            document.getElementById('edit_company_id').value = deal.company.id;
             
-            // Check if this company already exists in the dropdown
-            for (let i = 0; i < companySelect.options.length; i++) {
-                if (companySelect.options[i].value == deal.company_id) {
-                    optionExists = true;
-                    break;
-                }
-            }
+            // Set search input text
+            document.getElementById('edit_company_search').value = deal.company.name;
             
-            // If it doesn't exist, add it
-            if (!optionExists) {
-                const option = document.createElement('option');
-                option.value = deal.company.id;
-                option.text = deal.company.name;
-                companySelect.appendChild(option);
-            }
-            
-            // Set the selected value
-            companySelect.value = deal.company_id;
+            // Keep the green selection box hidden
+            document.getElementById('edit_selected_company').classList.add('hidden');
         } else {
-            // If no company data, show a message
             console.warn('No company data available for this deal');
+            document.getElementById('edit_company_search').value = 'Company #' + deal.company_id;
+            document.getElementById('edit_company_id').value = deal.company_id;
             
-            // Add a temporary option for the current company ID
-            const option = document.createElement('option');
-            option.value = deal.company_id;
-            option.text = 'Company #' + deal.company_id;
-            companySelect.appendChild(option);
-            companySelect.value = deal.company_id;
+            // Ensure the green selection box is hidden
+            document.getElementById('edit_selected_company').classList.add('hidden');
         }
         
         document.getElementById('edit_stage').value = deal.stage;
+        
+        // Set description if available
+        if (deal.description) {
+            document.getElementById('edit_description').value = deal.description;
+        }
         
         // Update the form action URL with the correct ID
         const form = document.getElementById('editDealForm');
@@ -404,8 +408,135 @@ function updateFormAction(form) {
     // Form will submit normally - no need to prevent default
 }
 
+// Company dropdown functionality for Create Deal form
+document.addEventListener('DOMContentLoaded', function() {
+    const companySearch = document.getElementById('company_search');
+    const companyDropdown = document.getElementById('company_dropdown');
+    const companyIdInput = document.getElementById('company_id');
+    const selectedCompany = document.getElementById('selected_company');
+    const selectedCompanyName = document.getElementById('selected_company_name');
+    const companyOptions = document.querySelectorAll('.company-option');
+
+    // Add click event to each company option
+    companyOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const companyId = this.getAttribute('data-company-id');
+            const companyNameElement = this.querySelector('.font-medium');
+            const companyName = companyNameElement ? companyNameElement.textContent : this.getAttribute('data-company-name');
+            
+            // Set the value in the hidden input
+            companyIdInput.value = companyId;
+            
+            // Keep the green box hidden
+            selectedCompany.classList.add('hidden');
+            
+            // Hide the dropdown
+            companyDropdown.classList.add('hidden');
+            
+            // Show the company name in the input field
+            companySearch.value = companyName;
+        });
+    });
+
+    // Show dropdown on input focus
+    companySearch.addEventListener('focus', function() {
+        companyDropdown.classList.remove('hidden');
+    });
+    
+    // Filter options as user types
+    companySearch.addEventListener('input', function() {
+        const searchText = this.value.toLowerCase();
+        
+        companyOptions.forEach(option => {
+            const companyName = option.getAttribute('data-company-name').toLowerCase();
+            
+            if (companyName.includes(searchText)) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+        
+        // Show dropdown when typing
+        companyDropdown.classList.remove('hidden');
+    });
+    
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!companySearch.contains(e.target) && !companyDropdown.contains(e.target)) {
+            companyDropdown.classList.add('hidden');
+        }
+    });
+});
+
+// Company dropdown functionality for Edit Deal form
+document.addEventListener('DOMContentLoaded', function() {
+    const companySearch = document.getElementById('edit_company_search');
+    const companyDropdown = document.getElementById('edit_company_dropdown');
+    const companyIdInput = document.getElementById('edit_company_id');
+    const selectedCompany = document.getElementById('edit_selected_company');
+    const selectedCompanyName = document.getElementById('edit_selected_company_name');
+    const companyOptions = document.querySelectorAll('.edit-company-option');
+
+    // Add click event to each company option
+    companyOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const companyId = this.getAttribute('data-company-id');
+            const companyNameElement = this.querySelector('.font-medium');
+            const companyName = companyNameElement ? companyNameElement.textContent : this.getAttribute('data-company-name');
+            
+            // Set the value in the hidden input
+            companyIdInput.value = companyId;
+            
+            // Keep the green box hidden
+            selectedCompany.classList.add('hidden');
+            
+            // Hide the dropdown
+            companyDropdown.classList.add('hidden');
+            
+            // Show the company name in the input field
+            companySearch.value = companyName;
+        });
+    });
+
+    // Show dropdown on input focus
+    companySearch.addEventListener('focus', function() {
+        companyDropdown.classList.remove('hidden');
+    });
+    
+    // Filter options as user types
+    companySearch.addEventListener('input', function() {
+        const searchText = this.value.toLowerCase();
+        
+        companyOptions.forEach(option => {
+            const companyName = option.getAttribute('data-company-name').toLowerCase();
+            
+            if (companyName.includes(searchText)) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+        
+        // Show dropdown when typing
+        companyDropdown.classList.remove('hidden');
+    });
+    
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!companySearch.contains(e.target) && !companyDropdown.contains(e.target)) {
+            companyDropdown.classList.add('hidden');
+        }
+    });
+});
+
 // Delete Deal Function
-function deleteDeal(dealId) {
+function deleteDeal(dealId, event) {
+    // Stop event propagation to prevent row click from firing
+    if (event) {
+        event.stopPropagation();
+    }
+    
     // Set the form action with the correct deal ID
     const form = document.getElementById('deleteDealForm');
     form.action = form.action.replace(/\/\d+$/, `/${dealId}`);
@@ -451,7 +582,7 @@ function confirmDeleteDeal() {
                         <p class="text-sm text-gray-600">Are you sure you want to delete this deal?</p>
                     </div>
                 </div>
-                <button onclick="closeModal('deleteDealModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="closeModal('deleteDealModal')" class="text-gray-400 hover:text-gray-600 cursor-pointer">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -468,10 +599,10 @@ function confirmDeleteDeal() {
                 @method('DELETE')
                 
                 <div class="flex space-x-3 pt-4">
-                    <button type="submit" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-all">
+                    <button type="submit" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-all cursor-pointer">
                         Yes, Delete Deal
                     </button>
-                    <button type="button" onclick="closeModal('deleteDealModal')" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                    <button type="button" onclick="closeModal('deleteDealModal')" class="cursor-pointer px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
                         Cancel
                     </button>
                 </div>

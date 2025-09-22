@@ -57,14 +57,13 @@ class InteractionsController extends Controller
                 'company_id' => 'required|exists:companies,id',
                 'type' => 'required|in:call,email,meeting,demo,follow-up,other',
                 'interaction_date' => 'nullable|date',
-                'notes' => 'nullable|string|max:2000',
-                'contact_id' => 'nullable|exists:contacts,id'
+                'notes' => 'nullable|string|max:2000'
             ]);
             
             // No authorization check needed as users can log interactions for any company
             $user = Auth::user();
     
-            $data = $request->only(['company_id', 'type', 'interaction_date', 'notes', 'contact_id']);
+            $data = $request->only(['company_id', 'type', 'interaction_date', 'notes']);
             $data['user_id'] = $user->id; // Assign the authenticated user
             
             // Set default interaction date if not provided
@@ -145,8 +144,7 @@ class InteractionsController extends Controller
                 'company_id' => 'required|exists:companies,id',
                 'type' => 'required|in:call,email,meeting,demo,follow-up,other',
                 'interaction_date' => 'nullable|date',
-                'notes' => 'nullable|string|max:2000',
-                'contact_id' => 'nullable|exists:contacts,id'
+                'notes' => 'nullable|string|max:2000'
             ]);
             
             // Ensure the company_id is valid - either:
@@ -165,7 +163,7 @@ class InteractionsController extends Controller
                 return redirect()->back()->with('error', 'You can only assign interactions to companies you have access to');
             }
     
-            $data = $request->only(['company_id', 'type', 'interaction_date', 'contact_id']);
+            $data = $request->only(['company_id', 'type', 'interaction_date']);
             
             // Handle both notes and description fields - they refer to the same data
             if ($request->has('notes')) {

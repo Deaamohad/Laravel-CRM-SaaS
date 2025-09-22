@@ -31,28 +31,7 @@
         </div>
     </div>
 
-    <!-- Flash Messages -->
-    @if (session('success'))
-    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm">
-        <div class="flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-            {{ session('success') }}
-        </div>
-    </div>
-    @endif
-
-    @if (session('error'))
-    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded shadow-sm">
-        <div class="flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            {{ session('error') }}
-        </div>
-    </div>
-    @endif
+    <!-- Flash Messages are handled in the layout -->
 
 
 
@@ -75,7 +54,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($interactions as $interaction)
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location.href='{{ route('companies.show', $interaction->company) }}'">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="w-8 h-8 rounded-lg flex items-center justify-center
@@ -126,9 +105,15 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ \Carbon\Carbon::parse($interaction->interaction_date)->format('M d, Y g:i A') }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button onclick="editInteraction({{ $interaction->id }})" class="text-blue-600 hover:text-blue-900 mr-3 cursor-pointer">Edit</button>
-                            <button onclick="deleteInteraction({{ $interaction->id }})" class="text-red-600 hover:text-red-900 cursor-pointer">Delete</button>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" onclick="event.stopPropagation()">
+                            <div class="flex space-x-2">
+                                <button onclick="editInteraction({{ $interaction->id }}, event)" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 rounded-md cursor-pointer transition-colors">
+                                    <span class="font-medium">Edit</span>
+                                </button>
+                                <button onclick="deleteInteraction({{ $interaction->id }}, event)" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 rounded-md cursor-pointer transition-colors">
+                                    <span class="font-medium">Delete</span>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -155,7 +140,7 @@
 </div>
 
 <!-- Log Interaction Modal -->
-<div id="logInteractionModal" class="fixed inset-0 z-50 items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+<div id="logInteractionModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
         <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-t-2xl p-6">
             <div class="flex justify-between items-center">
@@ -188,20 +173,34 @@
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Company *</label>
-                <select name="company_id" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    <option value="">Select Company</option>
-                    @foreach($companies as $company)
-                        <option value="{{ $company->id }}">{{ $company->name }}</option>
-                    @endforeach
-                </select>
+                <div class="relative">
+                    <input type="text" id="company_search" placeholder="Search for a company..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <input type="hidden" id="company_id" name="company_id" required value="{{ old('company_id') }}">
+                    
+                    <div id="company_dropdown" class="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto">
+                        @foreach($companies as $company)
+                            <div 
+                                class="company-option p-3 cursor-pointer hover:bg-purple-50" 
+                                data-company-id="{{ $company->id }}"
+                                data-company-name="{{ $company->name }}"
+                            >
+                                <div class="font-medium">{{ $company->name }}</div>
+                                <div class="text-xs text-gray-600">{{ $company->address ?: 'No address' }}</div>
+                                <div class="text-xs text-gray-500 truncate">{{ Str::limit($company->notes, 40) ?: 'No notes' }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                
+                <div id="selected_company" class="mt-2 p-2 border border-green-200 rounded-lg bg-green-50 hidden">
+                    <div class="font-medium" id="selected_company_name"></div>
+                </div>
+                
                 @error('company_id')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
-            <!-- Add a hidden field for contact_id with null value -->
-            <input type="hidden" name="contact_id" value="">
-            
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
                 <textarea name="notes" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Add interaction details..."></textarea>
@@ -274,12 +273,32 @@
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Company</label>
-                <select name="company_id" id="edit_company_id" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    <option value="">Select Company</option>
-                    @foreach($companies as $company)
-                        <option value="{{ $company->id }}">{{ $company->name }}</option>
-                    @endforeach
-                </select>
+                <div class="relative">
+                    <input type="text" id="edit_company_search" placeholder="Search for a company..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <input type="hidden" id="edit_company_id" name="company_id" required>
+                    
+                    <div id="edit_company_dropdown" class="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto">
+                        @foreach($companies as $company)
+                            <div 
+                                class="edit-company-option p-3 cursor-pointer hover:bg-purple-50" 
+                                data-company-id="{{ $company->id }}"
+                                data-company-name="{{ $company->name }}"
+                            >
+                                <div class="font-medium">{{ $company->name }}</div>
+                                <div class="text-xs text-gray-600">{{ $company->address ?: 'No address' }}</div>
+                                <div class="text-xs text-gray-500 truncate">{{ Str::limit($company->notes, 40) ?: 'No notes' }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                
+                <div id="edit_selected_company" class="mt-2 p-2 border border-green-200 rounded-lg bg-green-50 hidden">
+                    <div class="font-medium" id="edit_selected_company_name"></div>
+                </div>
+                
+                @if(count($companies) == 0)
+                    <p class="text-red-500 text-xs mt-1">No companies available. Please create a company first.</p>
+                @endif
             </div>
             
             <div>
@@ -366,7 +385,12 @@ function closeModal(modalId) {
 // Form already has action="{{ route('interactions.store') }}" method="POST" set
 
 // Edit Interaction Functions
-function editInteraction(interactionId) {
+function editInteraction(interactionId, event) {
+    // Stop event propagation to prevent row click from firing
+    if (event) {
+        event.stopPropagation();
+    }
+    
     fetch(`/interactions/${interactionId}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
@@ -382,7 +406,34 @@ function editInteraction(interactionId) {
     .then(interaction => {
         document.getElementById('edit_interaction_id').value = interaction.id;
         document.getElementById('edit_type').value = interaction.type;
-        document.getElementById('edit_company_id').value = interaction.company_id;
+        
+        // Set company data in the custom dropdown
+        if (interaction.company && interaction.company.name) {
+            // Set hidden input value
+            document.getElementById('edit_company_id').value = interaction.company_id;
+            
+            // Set search input text
+            document.getElementById('edit_company_search').value = interaction.company.name;
+            
+            // Keep the green selection box hidden
+            document.getElementById('edit_selected_company').classList.add('hidden');
+        } else {
+            console.warn('No company data available for this interaction');
+            document.getElementById('edit_company_id').value = interaction.company_id;
+            
+            // Try to find the company name from the dropdown options
+            const companyOption = document.querySelector(`.edit-company-option[data-company-id="${interaction.company_id}"]`);
+            if (companyOption) {
+                const companyNameElement = companyOption.querySelector('.font-medium');
+                document.getElementById('edit_company_search').value = companyNameElement ? companyNameElement.textContent : 'Company #' + interaction.company_id;
+            } else {
+                document.getElementById('edit_company_search').value = 'Company #' + interaction.company_id;
+            }
+            
+            // Ensure the green selection box is hidden
+            document.getElementById('edit_selected_company').classList.add('hidden');
+        }
+        
         document.getElementById('edit_notes').value = interaction.notes || ''; // Changed from description to notes
         
         // Format datetime for input
@@ -414,7 +465,12 @@ document.getElementById('editInteractionForm').addEventListener('submit', functi
 // with @csrf and @method('PUT') directives
 
 // Delete Interaction Function
-function deleteInteraction(interactionId) {
+function deleteInteraction(interactionId, event) {
+    // Stop event propagation to prevent row click from firing
+    if (event) {
+        event.stopPropagation();
+    }
+    
     // Set the form action with the correct interaction ID
     const form = document.getElementById('deleteInteractionForm');
     form.action = form.action.replace(/\/\d+$/, `/${interactionId}`);
@@ -434,5 +490,127 @@ function confirmDeleteInteraction() {
         console.error('No interaction selected for deletion');
     }
 }
+
+// Company dropdown functionality for Create Interaction form
+document.addEventListener('DOMContentLoaded', function() {
+    const companySearch = document.getElementById('company_search');
+    const companyDropdown = document.getElementById('company_dropdown');
+    const companyIdInput = document.getElementById('company_id');
+    const selectedCompany = document.getElementById('selected_company');
+    const selectedCompanyName = document.getElementById('selected_company_name');
+    const companyOptions = document.querySelectorAll('.company-option');
+
+    // Add click event to each company option
+    companyOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const companyId = this.getAttribute('data-company-id');
+            const companyNameElement = this.querySelector('.font-medium');
+            const companyName = companyNameElement ? companyNameElement.textContent : this.getAttribute('data-company-name');
+            
+            // Set the value in the hidden input
+            companyIdInput.value = companyId;
+            
+            // Keep the green box hidden
+            selectedCompany.classList.add('hidden');
+            
+            // Hide the dropdown
+            companyDropdown.classList.add('hidden');
+            
+            // Show the company name in the input field
+            companySearch.value = companyName;
+        });
+    });
+
+    // Show dropdown on input focus
+    companySearch.addEventListener('focus', function() {
+        companyDropdown.classList.remove('hidden');
+    });
+    
+    // Filter options as user types
+    companySearch.addEventListener('input', function() {
+        const searchText = this.value.toLowerCase();
+        
+        companyOptions.forEach(option => {
+            const companyName = option.getAttribute('data-company-name').toLowerCase();
+            
+            if (companyName.includes(searchText)) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+        
+        // Show dropdown when typing
+        companyDropdown.classList.remove('hidden');
+    });
+    
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!companySearch.contains(e.target) && !companyDropdown.contains(e.target)) {
+            companyDropdown.classList.add('hidden');
+        }
+    });
+});
+
+// Company dropdown functionality for Edit Interaction form
+document.addEventListener('DOMContentLoaded', function() {
+    const companySearch = document.getElementById('edit_company_search');
+    const companyDropdown = document.getElementById('edit_company_dropdown');
+    const companyIdInput = document.getElementById('edit_company_id');
+    const selectedCompany = document.getElementById('edit_selected_company');
+    const selectedCompanyName = document.getElementById('edit_selected_company_name');
+    const companyOptions = document.querySelectorAll('.edit-company-option');
+
+    // Add click event to each company option
+    companyOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const companyId = this.getAttribute('data-company-id');
+            const companyNameElement = this.querySelector('.font-medium');
+            const companyName = companyNameElement ? companyNameElement.textContent : this.getAttribute('data-company-name');
+            
+            // Set the value in the hidden input
+            companyIdInput.value = companyId;
+            
+            // Keep the green box hidden
+            selectedCompany.classList.add('hidden');
+            
+            // Hide the dropdown
+            companyDropdown.classList.add('hidden');
+            
+            // Show the company name in the input field
+            companySearch.value = companyName;
+        });
+    });
+
+    // Show dropdown on input focus
+    companySearch.addEventListener('focus', function() {
+        companyDropdown.classList.remove('hidden');
+    });
+    
+    // Filter options as user types
+    companySearch.addEventListener('input', function() {
+        const searchText = this.value.toLowerCase();
+        
+        companyOptions.forEach(option => {
+            const companyName = option.getAttribute('data-company-name').toLowerCase();
+            
+            if (companyName.includes(searchText)) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+        
+        // Show dropdown when typing
+        companyDropdown.classList.remove('hidden');
+    });
+    
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!companySearch.contains(e.target) && !companyDropdown.contains(e.target)) {
+            companyDropdown.classList.add('hidden');
+        }
+    });
+});
 </script>
 @endsection

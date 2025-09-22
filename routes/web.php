@@ -79,6 +79,7 @@ Route::middleware('auth')->group(function () {
     Route::post('companies', [CompaniesController::class, 'store'])->name('companies.store');
     Route::post('companies/quick-add', [DashboardController::class, 'quickAddCompany'])->name('companies.quick-add');
     Route::get('companies/{company}', [CompaniesController::class, 'show'])->name('companies.show');
+    Route::get('companies/{company}/edit', [CompaniesController::class, 'edit'])->name('companies.edit');
     Route::put('companies/{company}', [CompaniesController::class, 'update'])->name('companies.update');
     Route::delete('companies/{company}', [CompaniesController::class, 'destroy'])->name('companies.destroy');
 

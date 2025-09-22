@@ -4,30 +4,7 @@
 
 @section('content')
 <div class="p-6">
-    <!-- Flash Message -->
-    @if(session('success') || session('error'))
-        <div id="flash-message" class="mb-6 rounded-lg p-4 shadow-md {{ session('error') ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    @if(session('error'))
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    @else
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                    @endif
-                    <p class="font-medium">{{ session('success') ?? session('error') }}</p>
-                </div>
-                <button type="button" onclick="document.getElementById('flash-message').style.display = 'none';" class="text-gray-500 hover:text-gray-800">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    @endif
+    <!-- Flash Messages are handled in the layout -->
 
     <div class="mb-6">
         <a href="{{ route('companies.index') }}" class="text-blue-600 hover:text-blue-800 flex items-center">
@@ -38,11 +15,12 @@
         </a>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Company Details Card -->
-        <div class="lg:col-span-1">
+        <div class="md:col-span-1">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
+                <!-- Company Header - View Mode -->
+                <div id="companyViewHeader" class="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
                     <div class="flex items-start">
                         <div class="w-16 h-16 bg-white rounded-xl flex-shrink-0 flex items-center justify-center">
                             <span class="text-2xl font-bold text-blue-600">{{ substr($company->name, 0, 1) }}</span>
@@ -54,7 +32,30 @@
                     </div>
                 </div>
                 
-                <div class="p-6">
+                <!-- Company Header - Edit Mode (Initially Hidden) -->
+                <div id="companyEditHeader" class="bg-gradient-to-r from-blue-600 to-purple-600 p-6" style="display: none;">
+                    <div class="flex items-start">
+                        <div class="w-16 h-16 bg-white rounded-xl flex-shrink-0 flex items-center justify-center">
+                            <span class="text-2xl font-bold text-blue-600">{{ substr($company->name, 0, 1) }}</span>
+                        </div>
+                        <div class="ml-4 flex-grow overflow-hidden">
+                            <input type="text" name="name" form="companyEditForm" required maxlength="50" class="w-full px-3 py-2 text-xl font-bold text-gray-800 bg-white border-0 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="{{ $company->name }}" style="outline: none;">
+                            <select name="industry" form="companyEditForm" class="mt-2 w-full px-3 py-2 text-sm text-gray-800 bg-white border-0 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="outline: none;">
+                                <option value="">No industry</option>
+                                <option value="Technology" {{ $company->industry == 'Technology' ? 'selected' : '' }}>Technology</option>
+                                <option value="Healthcare" {{ $company->industry == 'Healthcare' ? 'selected' : '' }}>Healthcare</option>
+                                <option value="Finance" {{ $company->industry == 'Finance' ? 'selected' : '' }}>Finance</option>
+                                <option value="Education" {{ $company->industry == 'Education' ? 'selected' : '' }}>Education</option>
+                                <option value="Retail" {{ $company->industry == 'Retail' ? 'selected' : '' }}>Retail</option>
+                                <option value="Manufacturing" {{ $company->industry == 'Manufacturing' ? 'selected' : '' }}>Manufacturing</option>
+                                <option value="Other" {{ $company->industry == 'Other' ? 'selected' : '' }}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Company Details - View Mode -->
+                <div id="companyViewDetails" class="p-6">
                     <div class="mb-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Company Information</h3>
                         
@@ -99,22 +100,87 @@
                                     <p class="text-gray-900">{{ $company->created_at->format('F j, Y') }}</p>
                                 </div>
                             </div>
+                            
+                            <div class="flex items-start">
+                                <svg class="w-5 h-5 text-gray-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <div>
+                                    <p class="text-sm text-gray-500">Notes</p>
+                                    <p class="text-gray-900 whitespace-pre-wrap">{{ $company->notes ?: 'No notes' }}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="flex space-x-2">
-                        <button onclick="editCompany({{ $company->id }})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors">
+                        <button onclick="toggleEditMode()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors">
                             <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                             Edit
                         </button>
+                        <button onclick="confirmDeleteCompany()" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition-colors">
+                            <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Delete
+                        </button>
                     </div>
+                </div>
+                
+                <!-- Company Details - Edit Mode (Initially Hidden) -->
+                <div id="companyEditDetails" class="p-6" style="display: none;">
+                    <form id="companyEditForm" action="{{ route('companies.update', $company) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Edit Company Information</h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <input type="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="{{ $company->email }}">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                    <input type="tel" name="phone" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="{{ $company->phone }}">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                    <input type="text" name="address" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="{{ $company->address }}">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                                    <textarea name="notes" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Add any notes about this company...">{{ $company->notes }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors">
+                                <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Save Changes
+                            </button>
+                            <button type="button" onclick="toggleEditMode()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors">
+                                <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
         
-        <div class="lg:col-span-2">
+        <div class="md:col-span-2">
             <!-- Company Interactions -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
                 <div class="p-6 border-b border-gray-200 flex justify-between items-center">
@@ -616,8 +682,26 @@
         }
     });
 
-    function editCompany(id) {
-        window.location.href = `/companies/${id}/edit`;
+    function toggleEditMode() {
+        // Toggle visibility of view/edit sections
+        const viewHeader = document.getElementById('companyViewHeader');
+        const editHeader = document.getElementById('companyEditHeader');
+        const viewDetails = document.getElementById('companyViewDetails');
+        const editDetails = document.getElementById('companyEditDetails');
+        
+        if (viewHeader.style.display === 'none') {
+            // Switch to view mode
+            viewHeader.style.display = 'block';
+            viewDetails.style.display = 'block';
+            editHeader.style.display = 'none';
+            editDetails.style.display = 'none';
+        } else {
+            // Switch to edit mode
+            viewHeader.style.display = 'none';
+            viewDetails.style.display = 'none';
+            editHeader.style.display = 'block';
+            editDetails.style.display = 'block';
+        }
     }
     
     function viewInteractionDetails(id) {
@@ -814,4 +898,56 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Company Modal -->
+<div id="deleteCompanyModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+        <div class="bg-gradient-to-r from-red-500 to-pink-600 rounded-t-2xl p-6">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white">Delete Company</h3>
+                <button onclick="closeModal('deleteCompanyModal')" class="text-white hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <div class="mb-4">
+                <svg class="w-12 h-12 text-red-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                
+                <h4 class="text-lg font-semibold text-center mb-2">Are you sure?</h4>
+                <p class="text-center text-gray-600 mb-4">
+                    You're about to delete <span class="font-semibold">{{ $company->name }}</span>. This will also delete all associated deals and interactions.
+                </p>
+                <p class="text-sm text-red-800">
+                    <strong>Warning:</strong> This action cannot be undone. The company and all associated data will be permanently removed.
+                </p>
+            </div>
+            
+            <form id="deleteCompanyForm" action="{{ route('companies.destroy', $company) }}" method="POST">
+                @csrf
+                @method('DELETE')
+                
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-all">
+                        Yes, Delete Company
+                    </button>
+                    <button type="button" onclick="closeModal('deleteCompanyModal')" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDeleteCompany() {
+        openModal('deleteCompanyModal');
+    }
+</script>
 @endsection

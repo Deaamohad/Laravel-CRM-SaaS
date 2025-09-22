@@ -24,7 +24,6 @@ class DatabaseSeeder extends Seeder
         // Then seed other models with relationships
         $this->call([
             CompanySeeder::class,
-            ContactSeeder::class,
             DealSeeder::class,
             InteractionSeeder::class,
         ]);

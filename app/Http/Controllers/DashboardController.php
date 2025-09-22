@@ -373,7 +373,6 @@ class DashboardController extends Controller
             $validated = $request->validate([
                 'type' => 'required|string|in:call,email,meeting,demo,follow-up,other',
                 'company_id' => 'required|exists:companies,id',
-                'contact_id' => 'nullable|exists:contacts,id',
                 'notes' => 'nullable|string|max:2000',
                 'interaction_date' => 'nullable|date|before_or_equal:now',
             ], [
@@ -447,9 +446,6 @@ class DashboardController extends Controller
             if (empty($validated['company_id'])) {
                 throw new \Exception('Company is required.');
             }
-            
-            // Remove contact_id since we've removed contacts from the system
-            unset($validated['contact_id']);
             
             // Create the interaction
             $interaction = Interaction::create($validated);

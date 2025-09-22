@@ -16,9 +16,6 @@
     
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body class="font-sans antialiased bg-gray-50">
     <div class="min-h-screen flex">
@@ -92,18 +89,10 @@
                     
                     <div class="flex items-center">
                         <div class="flex items-center space-x-4">
-                            <!-- Notifications -->
-                            <button class="relative p-2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
-                            </svg>
-                            <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400"></span>
-                            </button>
-                            
                             <!-- User Dropdown -->
                             <div class="relative">
-                            <button class="flex items-center space-x-3 text-sm text-gray-700 hover:text-gray-900 focus:outline-none cursor-pointer">
-                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                            <button id="userMenuButton" class="flex items-center space-x-3 text-sm text-gray-700 hover:text-gray-900 focus:outline-none cursor-pointer rounded-lg px-3 py-2 hover:bg-gray-100 transition-colors">
+                                <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
                                     {{ Auth::check() ? strtoupper(substr(Auth::user()->name, 0, 1)) : 'D' }}
                                 </div>
                                 <span class="font-medium">{{ Auth::check() ? Auth::user()->name : 'Developer' }}</span>
@@ -112,18 +101,29 @@
                                 </svg>
                             </button>
                             
-                            <!-- Dropdown Menu (hidden by default, add JavaScript to toggle) -->
-                            <div class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
-                                <div class="py-1">
-                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profile</a>
-                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Settings</a>
-                                    <div class="border-t border-gray-100"></div>
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                            Sign out
-                                        </button>
-                                    </form>
+                            <!-- Dropdown Menu -->
+                            <div id="userMenu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50 transform origin-top-right transition-all duration-200 ease-out">
+                                <div class="p-2">
+                                    <div class="border-b border-gray-100 pb-2 mb-2">
+                                        <p class="px-4 py-2 text-sm font-medium text-gray-900">{{ Auth::check() ? Auth::user()->email : 'developer@example.com' }}</p>
+                                    </div>
+                                    <a href="{{ route('settings.index') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
+                                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                                        </svg>
+                                        Account Settings
+                                    </a>
+                                    <div class="border-t border-gray-100 mt-2 pt-2">
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit" class="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md">
+                                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                </svg>
+                                                Sign out
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                             </div>
@@ -134,9 +134,46 @@
 
             <!-- Page Content -->
             <main class="flex-1 p-6">
+                @if(session('success'))
+                    <x-flash-message type="success" message="{{ session('success') }}" />
+                @endif
+                
+                @if(session('error'))
+                    <x-flash-message type="error" message="{{ session('error') }}" />
+                @endif
+                
                 @yield('content')
             </main>
         </div>
     </div>
+    
+    <script>
+        // User dropdown toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const userMenuButton = document.getElementById('userMenuButton');
+            const userMenu = document.getElementById('userMenu');
+            
+            // Toggle dropdown when clicking the button
+            userMenuButton.addEventListener('click', function() {
+                userMenu.classList.toggle('hidden');
+                
+                // Add animation classes when showing
+                if (!userMenu.classList.contains('hidden')) {
+                    userMenu.classList.add('opacity-100', 'scale-100');
+                    userMenu.classList.remove('opacity-0', 'scale-95');
+                } else {
+                    userMenu.classList.add('opacity-0', 'scale-95');
+                    userMenu.classList.remove('opacity-100', 'scale-100');
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

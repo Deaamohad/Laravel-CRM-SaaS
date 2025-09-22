@@ -5,36 +5,7 @@
 @section('page-description', 'Welcome back! Here\'s what\'s happening with your business.')
 
 @section('content')
-<!-- Flash Messages -->
-@if(session('success'))
-    <div class="mb-6 bg-green-50 border-l-4 border-green-400 p-4 rounded-md">
-        <div class="flex">
-            <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                </svg>
-            </div>
-            <div class="ml-3">
-                <p class="text-sm text-green-700 font-medium">{{ session('success') }}</p>
-            </div>
-        </div>
-    </div>
-@endif
-
-@if(session('error'))
-    <div class="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
-        <div class="flex">
-            <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L10 11.414l2.707-2.707a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                </svg>
-            </div>
-            <div class="ml-3">
-                <p class="text-sm text-red-700 font-medium">{{ session('error') }}</p>
-            </div>
-        </div>
-    </div>
-@endif
+<!-- Flash Messages are handled in the layout -->
 
 <!-- Include notification component (for any remaining JavaScript notifications) -->
 @include('components.notification')
@@ -136,7 +107,7 @@
             
             <div class="space-y-4" id="recent-activity-list">
                 @forelse($stats['recent_interactions'] as $interaction)
-                <div class="flex items-start space-x-3">
+                <div class="flex items-start space-x-3 hover:bg-gray-50 rounded-lg p-2 cursor-pointer" onclick="window.location.href='{{ route('companies.show', $interaction->company) }}'">
                     <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
                         <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clip-rule="evenodd"/>
@@ -167,7 +138,7 @@
             
             <div class="space-y-4">
                 @forelse($recent_companies as $company)
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between hover:bg-gray-50 rounded-lg p-2 cursor-pointer" onclick="window.location='{{ route('companies.show', $company) }}'">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center text-white font-semibold">
                             {{ strtoupper(substr($company->name, 0, 1)) }}
@@ -196,7 +167,7 @@
             
             <div class="space-y-4">
                 @forelse($recent_deals as $deal)
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between hover:bg-gray-50 rounded-lg p-2 cursor-pointer" onclick="window.location.href='{{ route('companies.show', $deal->company) }}'">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-white">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -429,9 +400,6 @@
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>
-            
-            <!-- Add a hidden field for contact_id with null value -->
-            <input type="hidden" name="contact_id" value="">
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
