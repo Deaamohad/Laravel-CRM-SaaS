@@ -13,10 +13,15 @@ return new class extends Migration
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->string('name');
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('industry')->nullable();
+            $table->string('address')->nullable();
+            $table->string('industry')->nullable();
+            $table->text('notes')->nullable()->after('industry');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->timestamps();
         });
     }

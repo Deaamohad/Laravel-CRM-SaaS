@@ -2,9 +2,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-5">
             <div class="flex items-center space-x-4">
-                <img src="{{ asset('images/Logo.svg') }}" alt="Logo" class="w-12 h-12">
-                <a href="{{ route('home') }}" class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    Cliento
+                <a href="{{ route('home') }}" class="flex items-center space-x-3">
+                    <img src="{{ asset('images/Logo.svg') }}" alt="Logo" class="w-8 h-8">
+                    <h1 class="text-2xl font-bold text-gray-900">Cliento</h1>
                 </a>
             </div>
 
