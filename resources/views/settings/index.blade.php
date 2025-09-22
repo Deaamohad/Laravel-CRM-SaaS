@@ -3,337 +3,367 @@
 @section('title', 'Settings - Cliento')
 
 @section('content')
+<style>
+    /* Panel transition styles */
+    #profile-panel, #security-panel {
+        opacity: 0;
+        transition: opacity 150ms ease-in-out;
+    }
+    .panel-active {
+        opacity: 1 !important;
+    }
+</style>
+
 <div class="p-6">
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900">Settings</h1>
-        <p class="text-gray-600">Manage your CRM preferences and configuration</p>
+        <p class="text-gray-600">Manage your profile settings</p>
     </div>
 
+    <!-- Flash messages are handled in the main layout -->
+
+    <div class="mb-6 flex items-center space-x-4">
+        <button id="profile-tab" class="px-4 py-2 text-lg font-medium border-b-2 border-blue-600 text-blue-600 focus:outline-none" onclick="switchTab('profile')">
+            Profile Settings
+        </button>
+        <button id="security-tab" class="px-4 py-2 text-lg font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 focus:outline-none" onclick="switchTab('security')">
+            Security
+        </button>
+    </div>
+    
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Settings Menu -->
+        <!-- Left Sidebar with Profile Info -->
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Settings Menu</h3>
-                <nav class="space-y-2">
-                    <a href="#profile" class="flex items-center px-3 py-2 text-blue-600 bg-blue-50 rounded-lg cursor-pointer">
-                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-                        </svg>
-                        Profile Settings
-                    </a>
-                    <a href="#notifications" class="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
-                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
-                        </svg>
-                        Notifications
-                    </a>
-                    <a href="#security" class="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
-                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Security
-                    </a>
-                    <a href="#data" class="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer">
-                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                        </svg>
-                        Data Management
-                    </a>
-                </nav>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Profile</h3>
+                <div class="flex flex-col items-center">
+                    <div class="w-32 h-32 rounded-full overflow-hidden mb-4">
+                        @if($user->avatar)
+                            <img src="{{ asset('storage/avatars/' . $user->avatar) }}" alt="Profile" class="w-full h-full object-cover">
+                        @else
+                            <div class="w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-4xl font-semibold">
+                                {{ substr($user->name, 0, 1) }}
+                            </div>
+                        @endif
+                    </div>
+                    <h4 class="text-xl font-medium">{{ $user->name }}</h4>
+                    <p class="text-gray-500 mb-2">{{ $user->email }}</p>
+                    @if($user->job_title)
+                        <p class="text-gray-400 text-sm">{{ $user->job_title }}</p>
+                    @endif
+                    @if($user->phone)
+                        <p class="text-gray-400 text-sm mt-1">{{ $user->phone }}</p>
+                    @endif
+                </div>
             </div>
         </div>
 
-        <!-- Settings Content -->
+        <!-- Main Content Area - Tab Panels -->
         <div class="lg:col-span-2">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-6">Profile Settings</h3>
+            <!-- Profile Information Form - Initially visible -->
+            <div id="profile-panel" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Edit Profile</h3>
                 
-                <!-- Flash Messages are handled in the layout -->
-                
-                <form id="profileForm" action="{{ route('settings.profile') }}" method="POST" class="space-y-6">
+                <form id="profileForm" action="{{ route('settings.profile') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                            <input type="text" name="first_name" value="{{ $user->first_name }}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    
+                    <!-- Profile Picture -->
+                    <div class="mb-8">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
+                        <div class="mt-2 flex items-center">
+                            <div class="w-20 h-20 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                                @if($user->avatar)
+                                    <img src="{{ asset('storage/avatars/' . $user->avatar) }}" alt="Profile" class="w-full h-full object-cover">
+                                @else
+                                    <div class="w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-semibold">
+                                        {{ substr($user->first_name ?? '', 0, 1) }}{{ substr($user->last_name ?? '', 0, 1) }}
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="ml-5">
+                                <label for="avatar" class="bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer">
+                                    Change
+                                </label>
+                                <input id="avatar" name="avatar" type="file" accept="image/*" class="sr-only">
+                                <p class="mt-1 text-xs text-gray-500">JPG, PNG, GIF up to 2MB</p>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                            <input type="text" name="last_name" value="{{ $user->last_name }}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
+                        @error('avatar')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                        <input type="email" name="email" value="{{ $user->email }}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Username *</label>
+                        <input type="text" name="name" value="{{ $user->name }}" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        @error('name')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Job Title</label>
+                        <input type="text" name="job_title" value="{{ $user->job_title ?? '' }}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        @error('job_title')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                        <input type="email" name="email" value="{{ $user->email }}" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        @error('email')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                        <input type="tel" name="phone" value="+1 (555) 123-4567" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <input type="tel" name="phone" value="{{ $user->phone ?? '' }}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        @error('phone')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Company</label>
-                        <input type="text" name="company" value="{{ $user->company }}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    </div>
-                    
-                    <div class="flex items-center">
-                        <input type="checkbox" id="marketing" name="marketing_emails" value="1" {{ $user->marketing_emails ? 'checked' : '' }} class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                        <label for="marketing" class="ml-2 text-sm text-gray-600">
-                            Subscribe to marketing updates and product news
-                        </label>
-                    </div>
-                    
-                    <div class="flex space-x-3 pt-4">
+                    <div class="flex space-x-3 pt-6">
                         <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all cursor-pointer">
                             Update Profile
                         </button>
-                        <button type="button" onclick="resetForm()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                        <button type="button" onclick="resetProfileForm()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                             Cancel
                         </button>
                     </div>
                 </form>
             </div>
-
-            <!-- Data Management Section -->
-            <div class="mt-6 bg-white rounded-xl shadow-sm border border-red-200 p-6">
-                <h3 class="text-lg font-semibold text-red-900 mb-4">Data Management</h3>
-                <p class="text-gray-600 mb-6">Manage your CRM data and account settings. These actions cannot be undone.</p>
+            
+            <!-- Password Change Form - Initially visible (will be hidden by JS if needed) -->
+            <div id="security-panel" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Change Password</h3>
+                <p class="text-sm text-gray-500 mb-6">Update your password to maintain account security</p>
                 
-                <div class="space-y-4">
-                    <button onclick="resetData()" class="w-full md:w-auto px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors cursor-pointer">
-                        Reset All Data
-                    </button>
-                    <button onclick="deleteAccount()" class="w-full md:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors ml-0 md:ml-3 cursor-pointer">
-                        Delete Account
-                    </button>
+                @if(session('error'))
+                <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3a1 1 0 102 0V7zm0 7a1 1 0 10-2 0 1 1 0 102 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-800">{{ session('error') }}</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Reset Data Modal -->
-<div id="resetDataModal" class="fixed inset-0 z-50 items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
-        <div class="p-6">
-            <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Reset All Data</h3>
-                    <p class="text-sm text-gray-600">Are you sure you want to reset all CRM data?</p>
-                </div>
-            </div>
-            
-            <div class="bg-yellow-50 rounded-lg p-4 mb-6">
-                <p class="text-sm text-yellow-800">
-                    <strong>Warning:</strong> This will delete all companies, deals, and interactions. This action cannot be undone.
-                </p>
-            </div>
-            
-            <div class="flex space-x-3">
-                <button onclick="confirmResetData()" class="flex-1 bg-yellow-600 text-white py-3 rounded-lg font-semibold hover:bg-yellow-700 transition-colors cursor-pointer">
-                    Yes, Reset Data
-                </button>
-                <button onclick="closeModal('resetDataModal')" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors cursor-pointer">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Delete Account Modal -->
-<div id="deleteAccountModal" class="fixed inset-0 z-50 items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
-        <div class="p-6">
-            <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Delete Account</h3>
-                    <p class="text-sm text-gray-600">Are you sure you want to delete your account?</p>
-                </div>
-            </div>
-            
-            <div class="bg-red-50 rounded-lg p-4 mb-6">
-                <p class="text-sm text-red-800">
-                    <strong>Warning:</strong> This will permanently delete your account and all data. This action cannot be undone.
-                </p>
-            </div>
-            
-            <div class="flex space-x-3">
-                <button onclick="confirmDeleteAccount()" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors cursor-pointer">
-                    Yes, Delete Account
-                </button>
-                <button onclick="closeModal('deleteAccountModal')" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors cursor-pointer">
-                    Cancel
-                </button>
+                @endif
+                
+                <form id="passwordForm" action="{{ route('settings.password') }}" method="POST" class="space-y-6">
+                    @csrf
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Current Password *</label>
+                        <input type="password" name="current_password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        @error('current_password')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">New Password *</label>
+                        <input type="password" name="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        @error('password')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password *</label>
+                        <input type="password" name="password_confirmation" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <div class="flex space-x-3 pt-6">
+                        <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all cursor-pointer">
+                            Update Password
+                        </button>
+                        <button type="button" onclick="resetPasswordForm()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-function resetForm() {
+function resetProfileForm() {
+    // Reset the form
     document.getElementById('profileForm').reset();
+    
+    // Also clear the file input (not always cleared by form reset)
+    const fileInput = document.getElementById('avatar');
+    if (fileInput) {
+        fileInput.value = '';
+    }
+    
+    showNotification('Profile form reset');
 }
 
-function resetData() {
-    openModal('resetDataModal');
+function resetPasswordForm() {
+    // Reset the password form
+    document.getElementById('passwordForm').reset();
+    
+    showNotification('Password form reset');
 }
 
-function deleteAccount() {
-    openModal('deleteAccountModal');
+function showNotification(message) {
+    // Show a small notification
+    const notification = document.createElement('div');
+    notification.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg transition-opacity duration-300';
+    notification.innerHTML = message;
+    document.body.appendChild(notification);
+    
+    // Remove notification after 2 seconds
+    setTimeout(function() {
+        notification.style.opacity = '0';
+        setTimeout(function() {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 2000);
 }
 
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+// Switch between profile and security tabs
+function switchTab(tab) {
+    // Update tab buttons immediately
+    document.getElementById('profile-tab').classList.remove('border-blue-600', 'text-blue-600');
+    document.getElementById('profile-tab').classList.add('border-transparent', 'text-gray-500');
+    document.getElementById('security-tab').classList.remove('border-blue-600', 'text-blue-600');
+    document.getElementById('security-tab').classList.add('border-transparent', 'text-gray-500');
+    
+    // Activate the selected tab
+    document.getElementById(`${tab}-tab`).classList.remove('border-transparent', 'text-gray-500');
+    document.getElementById(`${tab}-tab`).classList.add('border-blue-600', 'text-blue-600');
+    
+    // Add CSS opacity transitions
+    const profilePanel = document.getElementById('profile-panel');
+    const securityPanel = document.getElementById('security-panel');
+    
+    // Set initial styles if not already set
+    if (!profilePanel.style.transition) {
+        profilePanel.style.transition = 'opacity 150ms ease-in-out';
+        securityPanel.style.transition = 'opacity 150ms ease-in-out';
+    }
+    
+    // Show/hide panels with smooth transition
+    if (tab === 'profile') {
+        // Hide security panel
+        securityPanel.style.opacity = '0';
+        setTimeout(() => {
+            securityPanel.classList.add('hidden');
+            // Show profile panel
+            profilePanel.classList.remove('hidden');
+            setTimeout(() => {
+                profilePanel.style.opacity = '1';
+            }, 10);
+        }, 150);
+    } else {
+        // Hide profile panel
+        profilePanel.style.opacity = '0';
+        setTimeout(() => {
+            profilePanel.classList.add('hidden');
+            // Show security panel
+            securityPanel.classList.remove('hidden');
+            setTimeout(() => {
+                securityPanel.style.opacity = '1';
+            }, 10);
+        }, 150);
+    }
 }
 
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-}
-
-function confirmResetData() {
-    // In a real app, this would make an API call
-    alert('Demo: All data would be reset here');
-    closeModal('resetDataModal');
-}
-
-function confirmDeleteAccount() {
-    // In a real app, this would make an API call
-    alert('Demo: Account would be deleted here');
-    closeModal('deleteAccountModal');
-}
-</script>
-
-<!-- Delete Account Confirmation Modal -->
-<div id="deleteAccountModal" class="fixed inset-0 z-50 items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
-        <div class="p-6">
-            <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
-                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Delete Account</h3>
-                    <p class="text-sm text-gray-600">This action is irreversible!</p>
-                </div>
-            </div>
-            
-            <div class="bg-red-50 rounded-lg p-4 mb-6">
-                <p class="text-sm text-red-800">
-                    <strong>Final Warning:</strong> This will permanently delete your account and all associated data. This action cannot be undone.
-                </p>
-            </div>
-            
-            <div class="flex space-x-3">
-                <button onclick="confirmDeleteAccount()" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
-                    Yes, Delete Account
-                </button>
-                <button onclick="closeModal('deleteAccountModal')" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-// Modal functions
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-}
-
-// Profile form submission is now handled by standard Laravel form submission
-
-// Reset form function
-function resetForm() {
-    document.getElementById('profileForm').reset();
-    document.querySelector('input[name="company"]').value = 'Cliento CRM';
-    document.querySelector('select[name="timezone"]').value = 'UTC-05:00 Eastern Time';
-    document.getElementById('email-notifications').checked = true;
-    document.getElementById('marketing-emails').checked = false;
-}
-
-// Reset data function
-function resetData() {
-    openModal('resetDataModal');
-}
-
-function confirmResetData() {
-    fetch('/settings/reset-data', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        closeModal('resetDataModal');
-        if (data.success) {
-            alert('All data has been reset successfully!');
-        } else {
-            alert('Error resetting data: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        closeModal('resetDataModal');
-        console.error('Error:', error);
-        alert('Error resetting data');
-    });
-}
-
-// Delete account function
-function deleteAccount() {
-    openModal('deleteAccountModal');
-}
-
-function confirmDeleteAccount() {
-    fetch('/settings/delete-account', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        closeModal('deleteAccountModal');
-        if (data.success) {
-            alert('Account deletion initiated. All data has been cleared.');
-            window.location.href = '/';
-        } else {
-            alert('Error deleting account: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        closeModal('deleteAccountModal');
-        console.error('Error:', error);
-        alert('Error deleting account');
-    });
-}
+// Initialize tabs based on session or form errors
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for active tab in session
+    const activeTab = '{{ session('active_tab') }}';
+    
+    // Check for errors in the password form that would need to show that tab
+    const hasPasswordErrors = {{ $errors->has('current_password') || $errors->has('password') ? 'true' : 'false' }};
+    const successMessage = {{ session('success') ? 'true' : 'false' }};
+    
+    // Set both panels to hidden initially to prevent flash
+    const profilePanel = document.getElementById('profile-panel');
+    const securityPanel = document.getElementById('security-panel');
+    
+    profilePanel.classList.add('hidden');
+    securityPanel.classList.add('hidden');
+    
+    // Determine which tab to show (priority: active_tab in session, then password errors, then default to profile)
+    if (activeTab === 'security') {
+        // Show security tab immediately to prevent flicker
+        document.getElementById('profile-tab').classList.remove('border-blue-600', 'text-blue-600');
+        document.getElementById('profile-tab').classList.add('border-transparent', 'text-gray-500');
+        document.getElementById('security-tab').classList.remove('border-transparent', 'text-gray-500');
+        document.getElementById('security-tab').classList.add('border-blue-600', 'text-blue-600');
+        
+        securityPanel.classList.remove('hidden');
+        setTimeout(() => {
+            securityPanel.style.opacity = '1';
+        }, 10);
+    } else if (hasPasswordErrors) {
+        // Show security tab immediately to prevent flicker
+        document.getElementById('profile-tab').classList.remove('border-blue-600', 'text-blue-600');
+        document.getElementById('profile-tab').classList.add('border-transparent', 'text-gray-500');
+        document.getElementById('security-tab').classList.remove('border-transparent', 'text-gray-500');
+        document.getElementById('security-tab').classList.add('border-blue-600', 'text-blue-600');
+        
+        securityPanel.classList.remove('hidden');
+        setTimeout(() => {
+            securityPanel.style.opacity = '1';
+        }, 10);
+    } else {
+        // Show profile tab immediately to prevent flicker
+        document.getElementById('profile-tab').classList.add('border-blue-600', 'text-blue-600');
+        document.getElementById('security-tab').classList.add('border-transparent', 'text-gray-500');
+        
+        profilePanel.classList.remove('hidden');
+        setTimeout(() => {
+            profilePanel.style.opacity = '1';
+        }, 10);
+    }
+    
+    // Show flash messages if they exist
+    if (successMessage) {
+        // Ensure flash messages are visible regardless of which tab is shown
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(message => {
+            message.style.display = 'block';
+        });
+    }
+    
+    // Preview selected image before upload
+    const avatar = document.getElementById('avatar');
+    
+    if (avatar) {
+        avatar.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const profileImgContainer = document.querySelector('.w-20.h-20.rounded-full.overflow-hidden img, .w-20.h-20.rounded-full.overflow-hidden div');
+                    
+                    if (profileImgContainer) {
+                        // If it's already an image tag
+                        if (profileImgContainer.tagName === 'IMG') {
+                            profileImgContainer.src = e.target.result;
+                        } else {
+                            // If it's a div with initials, replace with an image
+                            const parent = profileImgContainer.parentElement;
+                            parent.innerHTML = '<img src="' + e.target.result + '" alt="Profile" class="w-full h-full object-cover">';
+                        }
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
 </script>
 @endsection

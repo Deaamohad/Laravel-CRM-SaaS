@@ -72,6 +72,7 @@ Route::middleware('auth')->group(function () {
 
     // Settings Routes
     Route::post('settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.profile');
+    Route::post('settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password');
     Route::post('settings/reset-data', [SettingsController::class, 'resetData'])->name('settings.reset-data');
     Route::post('settings/delete-account', [SettingsController::class, 'deleteAccount'])->name('settings.delete-account');
 
