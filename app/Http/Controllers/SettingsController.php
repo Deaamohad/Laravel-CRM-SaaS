@@ -30,13 +30,7 @@ class SettingsController extends Controller
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ];
         
-        $request->validate($rules);
-        
-        // Update user fields
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->phone = $request->phone;
-        $user->job_title = $request->job_title;
+        $validatedData = $request->validate($rules);
         
         // Handle avatar upload if present
         if ($request->hasFile('avatar')) {
@@ -47,21 +41,10 @@ class SettingsController extends Controller
             
             $avatarName = time() . '.' . $request->avatar->extension();
             $request->avatar->storeAs('public/avatars', $avatarName);
-            $user->avatar = $avatarName;
+            $validatedData['avatar'] = $avatarName;
         }
         
-        DB::table('users')
-            ->where('id', $user->id)
-            ->update([
-                'name' => $user->name,
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
-                'email' => $user->email,
-                'phone' => $user->phone,
-                'job_title' => $user->job_title,
-                'avatar' => $user->avatar,
-                'password' => $user->password
-            ]);
+        $user->update($validatedData);
         
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json(['success' => true, 'message' => 'Profile updated successfully']);

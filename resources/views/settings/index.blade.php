@@ -76,16 +76,17 @@
                                     <img src="{{ asset('storage/avatars/' . $user->avatar) }}" alt="Profile" class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-semibold">
-                                        {{ substr($user->first_name ?? '', 0, 1) }}{{ substr($user->last_name ?? '', 0, 1) }}
+                                        {{ substr($user->name, 0, 1) }}
                                     </div>
                                 @endif
                             </div>
-                            <div class="ml-5">
+                            <div class="ml-5 flex flex-col">
                                 <label for="avatar" class="bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer">
+
                                     Change
                                 </label>
                                 <input id="avatar" name="avatar" type="file" accept="image/*" class="sr-only">
-                                <p class="mt-1 text-xs text-gray-500">JPG, PNG, GIF up to 2MB</p>
+                                <p class="mt-1.5 text-xs text-gray-500">JPG, PNG, GIF up to 2MB</p>
                             </div>
                         </div>
                         @error('avatar')

@@ -165,14 +165,14 @@
                     Get Started Free
                 </button>
                 <p class="text-sm text-gray-500 text-center mt-4 font-medium">
-                    ✨ No credit card required
+                    No credit card required
                 </p>
             </div>
 
             <div class="pricing-card-featured-enhanced hover-lift text-center">
                 <div class="absolute -top-6 left-1/2 transform -translate-x-1/2">
                     <span class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded-full text-sm font-bold tracking-wide shadow-lg">
-                        🔥 Most Popular
+                        Most Popular
                     </span>
                 </div>
                 
@@ -228,7 +228,7 @@
                     Start Free Trial
                 </button>
                 <p class="text-sm text-blue-600 text-center mt-4 font-medium">
-                    🎯 14-day free trial • Cancel anytime
+                    14-day free trial • Cancel anytime
                 </p>
             </div>
 
@@ -286,7 +286,7 @@
                     Contact Sales
                 </button>
                 <p class="text-sm text-gray-500 text-center mt-4 font-medium">
-                    📞 Schedule a personalized demo
+                    Schedule a personalized demo
                 </p>
             </div>
         </div>
@@ -306,7 +306,7 @@
                     </a>
                 </div>
                 <p class="text-sm text-gray-500 mt-6">
-                    💬 Average response time: 2 hours • 🔒 No commitment required
+                    Average response time: 2 hours • No commitment required
                 </p>
             </div>
         </div>

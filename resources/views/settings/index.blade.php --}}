@@ -1,0 +1,53 @@
+{{-- ... existing code inside the 'security' tab content div ... --}}
+
+{{-- Danger Zone --}}
+<div class="mt-12 pt-8 border-t border-gray-200">
+    <h3 class="text-lg font-semibold text-red-600">Danger Zone</h3>
+    <p class="mt-1 text-sm text-gray-600">These actions are irreversible. Please be certain before proceeding.</p>
+
+    <div class="mt-6 space-y-4">
+        {{-- Reset All Data --}}
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div>
+                <h4 class="font-semibold text-gray-800">Reset All Application Data</h4>
+                <p class="text-sm text-gray-600">Permanently delete all companies, deals, and interactions.</p>
+            </div>
+            <button onclick="openModal('resetDataModal')" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                Reset Data
+            </button>
+        </div>
+
+        {{-- Delete Account --}}
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div>
+                <h4 class="font-semibold text-gray-800">Delete Your Account</h4>
+                <p class="text-sm text-gray-600">Permanently delete your account and all associated data.</p>
+            </div>
+            <button onclick="openModal('deleteAccountModal')" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                Delete Account
+            </button>
+        </div>
+    </div>
+</div>
+
+{{-- Modals --}}
+
+<!-- Reset Data Modal -->
+<div id="resetDataModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div class="p-6">
+            <div class="flex items-start">
+                <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <svg class="h-6 w-6 text-red-600" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4 text-left">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Reset All Data</h3>
+                    <div class="mt-2">
+                        <p class="text-sm text-gray-500">Are you sure you want to reset all data? This will permanently delete all companies, deals, and interactions. This action cannot be undone.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm

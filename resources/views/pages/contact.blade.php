@@ -186,7 +186,7 @@
                                 Send Message
                             </button>
                             <p class="text-sm text-gray-500 text-center mt-4 font-medium">
-                                🔒 We respect your privacy. Your information will never be shared with third parties.
+                                We respect your privacy. Your information will never be shared with third parties.
                             </p>
                         </div>
                     </form>
@@ -243,7 +243,7 @@
                                 <p class="text-gray-700 text-lg">
                                     <strong class="text-gray-900">Mobile:</strong> <a href="tel:+962790000000" class="contact-highlight-text text-xl font-bold">+962 00 000 0000</a>
                                 </p>
-                                <p class="text-sm text-gray-600 font-medium">📞 Available 24/7 for urgent support</p>
+                                <p class="text-sm text-gray-600 font-medium">Available 24/7 for urgent support</p>
                             </div>
                         </div>
                         
@@ -259,7 +259,7 @@
                                 <p class="text-gray-700 text-lg">
                                     <strong class="text-gray-900">Support:</strong> <a href="mailto:support@crmapp.jo" class="contact-highlight-text text-xl font-bold">support@crmapp.jo</a>
                                 </p>
-                                <p class="text-sm text-gray-600 font-medium">⚡ Response within 2 hours during business days</p>
+                                <p class="text-sm text-gray-600 font-medium">Response within 2 hours during business days</p>
                             </div>
                         </div>
                     </div>
@@ -267,11 +267,6 @@
 
                 <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg p-8 text-white">
                     <div class="text-center">
-                        <div class="bg-white bg-opacity-20 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                        </div>
                         <h3 class="text-xl font-semibold mb-4">Need Immediate Help?</h3>
                         <p class="text-blue-100 mb-6">
                             Join thousands of businesses in Jordan and the Middle East already using our CRM
