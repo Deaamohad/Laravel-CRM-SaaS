@@ -45,15 +45,14 @@ class ApiManagementController extends Controller
             'GET /api/dashboard-stats' => 'Get detailed dashboard stats',
         ];
 
-        // Get the current user's company ID
+        // Get the current user
         $user = \Illuminate\Support\Facades\Auth::user();
-        $companyId = $user->company_id;
         
         $stats = [
-            'total_companies' => Company::where('id', $companyId)->count(),
-            'total_deals' => Deal::where('company_id', $companyId)->count(),
-            'total_interactions' => Interaction::where('company_id', $companyId)->count(),
-            'total_deal_value' => Deal::where('company_id', $companyId)->sum('value'),
+            'total_companies' => Company::where('user_id', $user->id)->count(),
+            'total_deals' => Deal::where('user_id', $user->id)->count(),
+            'total_interactions' => Interaction::where('user_id', $user->id)->count(),
+            'total_deal_value' => Deal::where('user_id', $user->id)->sum('value'),
         ];
 
         return view('api.management', compact('apiEndpoints', 'stats'));

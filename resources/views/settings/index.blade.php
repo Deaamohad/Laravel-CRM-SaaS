@@ -29,9 +29,6 @@
         <button id="security-tab" class="px-3 md:px-4 py-2 text-sm md:text-lg font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 focus:outline-none whitespace-nowrap" onclick="switchTab('security')">
             Security
         </button>
-        <button id="api-tab" class="px-3 md:px-4 py-2 text-sm md:text-lg font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 focus:outline-none whitespace-nowrap" onclick="switchTab('api')">
-            API Tokens
-        </button>
     </div>
     
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
@@ -67,35 +64,9 @@
             <div id="profile-panel" class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-6">Edit Profile</h3>
                 
-                <form id="profileForm" action="{{ route('settings.profile') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <form id="profileForm" action="{{ route('settings.profile') }}" method="POST" class="space-y-6">
                     @csrf
                     
-                    <!-- Profile Picture -->
-                    <div class="mb-8">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
-                        <div class="mt-2 flex items-center">
-                            <div class="w-20 h-20 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
-                                @if($user->avatar)
-                                    <img src="{{ asset('storage/avatars/' . $user->avatar) }}" alt="Profile" class="w-full h-full object-cover">
-                                @else
-                                    <div class="w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-semibold">
-                                        {{ substr($user->name, 0, 1) }}
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="ml-5 flex flex-col">
-                                <label for="avatar" class="bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer">
-
-                                    Change
-                                </label>
-                                <input id="avatar" name="avatar" type="file" accept="image/*" class="sr-only">
-                                <p class="mt-1.5 text-xs text-gray-500">JPG, PNG, GIF up to 2MB</p>
-                            </div>
-                        </div>
-                        @error('avatar')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Username *</label>
@@ -193,43 +164,53 @@
                         </button>
                     </div>
                 </form>
-            </div>
-            
-            <!-- API Tokens Panel -->
-            <div id="api-panel" class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6" style="display: none;">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">API Token Management</h3>
-                <p class="text-sm text-gray-500 mb-6">Create and manage your API tokens for integrations and automation.</p>
                 
-                <!-- Create New Token -->
-                <div class="mb-6 p-4 bg-blue-50 rounded-lg">
-                    <h4 class="font-semibold text-blue-900 mb-2">Create New API Token</h4>
-                    <form id="createTokenForm" class="flex flex-col md:flex-row gap-2">
-                        <input type="text" id="tokenName" placeholder="Token name (e.g., 'Mobile App')" 
-                               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                            Create Token
+                <!-- Danger Zone Section -->
+                <div class="mt-12 pt-8 border-t border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Danger Zone</h3>
+                    <p class="text-sm text-gray-500 mb-6">These actions are irreversible. Please be careful.</p>
+                    
+                    <!-- Reset All Data -->
+                    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-red-900 mb-2">Reset All Data</h4>
+                                <p class="text-sm text-red-700 mb-3">This will permanently delete all your companies, deals, and interactions. This action cannot be undone.</p>
+                                <ul class="text-xs text-red-600 space-y-1">
+                                    <li>• All companies will be deleted</li>
+                                    <li>• All deals will be deleted</li>
+                                    <li>• All interactions will be deleted</li>
+                                    <li>• Your account and profile will remain intact</li>
+                                </ul>
+                            </div>
+                            <button onclick="confirmResetData()" class="ml-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                                Reset Data
                         </button>
-                    </form>
+                        </div>
                 </div>
 
-                <!-- Current Tokens -->
-                <div id="tokensList">
-                    <h4 class="font-semibold text-gray-900 mb-3">Your API Tokens</h4>
-                    <div id="tokensContainer" class="space-y-3">
-                        <p class="text-gray-500 text-sm">Loading tokens...</p>
+                    <!-- Delete Account -->
+                    <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-red-900 mb-2">Delete Account</h4>
+                                <p class="text-sm text-red-700 mb-3">This will permanently delete your account and all associated data. This action cannot be undone.</p>
+                                <ul class="text-xs text-red-600 space-y-1">
+                                    <li>• Your account will be deleted</li>
+                                    <li>• All companies will be deleted</li>
+                                    <li>• All deals will be deleted</li>
+                                    <li>• All interactions will be deleted</li>
+                                    <li>• You will be logged out immediately</li>
+                                </ul>
+                            </div>
+                            <button onclick="confirmDeleteAccount()" class="ml-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                                Delete Account
+                            </button>
+                        </div>
                     </div>
                 </div>
-
-                <!-- API Documentation Link -->
-                <div class="mt-6 pt-6 border-t border-gray-200">
-                    <a href="{{ route('api.management') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                        </svg>
-                        View Full API Documentation
-                    </a>
-                </div>
             </div>
+            
         </div>
     </div>
 </div>
@@ -271,15 +252,15 @@ function showNotification(message) {
     }, 2000);
 }
 
-// Switch between profile, security, and API tabs
+// Switch between profile and security tabs
 function switchTab(tab) {
+    console.log('Switching to tab:', tab);
+    
     // Update tab buttons immediately
     document.getElementById('profile-tab').classList.remove('border-blue-600', 'text-blue-600');
     document.getElementById('profile-tab').classList.add('border-transparent', 'text-gray-500');
     document.getElementById('security-tab').classList.remove('border-blue-600', 'text-blue-600');
     document.getElementById('security-tab').classList.add('border-transparent', 'text-gray-500');
-    document.getElementById('api-tab').classList.remove('border-blue-600', 'text-blue-600');
-    document.getElementById('api-tab').classList.add('border-transparent', 'text-gray-500');
     
     // Activate the selected tab
     document.getElementById(`${tab}-tab`).classList.remove('border-transparent', 'text-gray-500');
@@ -288,23 +269,19 @@ function switchTab(tab) {
     // Add CSS opacity transitions
     const profilePanel = document.getElementById('profile-panel');
     const securityPanel = document.getElementById('security-panel');
-    const apiPanel = document.getElementById('api-panel');
     
     // Set initial styles if not already set
     if (!profilePanel.style.transition) {
         profilePanel.style.transition = 'opacity 150ms ease-in-out';
         securityPanel.style.transition = 'opacity 150ms ease-in-out';
-        apiPanel.style.transition = 'opacity 150ms ease-in-out';
     }
     
     // Show/hide panels with smooth transition
     if (tab === 'profile') {
-        // Hide other panels
+        // Hide security panel
         securityPanel.style.opacity = '0';
-        apiPanel.style.opacity = '0';
         setTimeout(() => {
             securityPanel.classList.add('hidden');
-            apiPanel.classList.add('hidden');
             // Show profile panel
             profilePanel.classList.remove('hidden');
             setTimeout(() => {
@@ -312,30 +289,14 @@ function switchTab(tab) {
             }, 10);
         }, 150);
     } else if (tab === 'security') {
-        // Hide other panels
+        // Hide profile panel
         profilePanel.style.opacity = '0';
-        apiPanel.style.opacity = '0';
         setTimeout(() => {
             profilePanel.classList.add('hidden');
-            apiPanel.classList.add('hidden');
             // Show security panel
             securityPanel.classList.remove('hidden');
             setTimeout(() => {
                 securityPanel.style.opacity = '1';
-            }, 10);
-        }, 150);
-    } else if (tab === 'api') {
-        // Hide other panels
-        profilePanel.style.opacity = '0';
-        securityPanel.style.opacity = '0';
-        setTimeout(() => {
-            profilePanel.classList.add('hidden');
-            securityPanel.classList.add('hidden');
-            // Show API panel
-            apiPanel.classList.remove('hidden');
-            setTimeout(() => {
-                apiPanel.style.opacity = '1';
-                loadApiTokens(); // Load tokens when API tab is shown
             }, 10);
         }, 150);
     }
@@ -343,24 +304,29 @@ function switchTab(tab) {
 
 // Initialize tabs based on session or form errors
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Settings page loaded successfully!');
+    
     // Check for active tab in session
     const activeTab = '{{ session('active_tab') }}';
+    const hasSuccess = {{ session('success') ? 'true' : 'false' }};
     
     // Check for errors in the password form that would need to show that tab
     const hasPasswordErrors = {{ $errors->has('current_password') || $errors->has('password') ? 'true' : 'false' }};
-    const successMessage = {{ session('success') ? 'true' : 'false' }};
     
     // Set all panels to hidden initially to prevent flash
     const profilePanel = document.getElementById('profile-panel');
     const securityPanel = document.getElementById('security-panel');
-    const apiPanel = document.getElementById('api-panel');
+    
+    console.log('Panels found:', {
+        profilePanel: !!profilePanel,
+        securityPanel: !!securityPanel
+    });
     
     profilePanel.classList.add('hidden');
     securityPanel.classList.add('hidden');
-    apiPanel.classList.add('hidden');
     
-    // Determine which tab to show (priority: active_tab in session, then password errors, then default to profile)
-    if (activeTab === 'security') {
+    // Determine which tab to show (priority: URL parameter, then session, then password errors, then default to profile)
+    if (activeTab === 'security' || hasSuccess) {
         // Show security tab immediately to prevent flicker
         document.getElementById('profile-tab').classList.remove('border-blue-600', 'text-blue-600');
         document.getElementById('profile-tab').classList.add('border-transparent', 'text-gray-500');
@@ -394,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Show flash messages if they exist
-    if (successMessage) {
+    if (hasSuccess) {
         // Ensure flash messages are visible regardless of which tab is shown
         const flashMessages = document.querySelectorAll('.flash-message');
         flashMessages.forEach(message => {
@@ -402,182 +368,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Preview selected image before upload
-    const avatar = document.getElementById('avatar');
-    
-    if (avatar) {
-        avatar.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const profileImgContainer = document.querySelector('.w-20.h-20.rounded-full.overflow-hidden img, .w-20.h-20.rounded-full.overflow-hidden div');
-                    
-                    if (profileImgContainer) {
-                        // If it's already an image tag
-                        if (profileImgContainer.tagName === 'IMG') {
-                            profileImgContainer.src = e.target.result;
-                        } else {
-                            // If it's a div with initials, replace with an image
-                            const parent = profileImgContainer.parentElement;
-                            parent.innerHTML = '<img src="' + e.target.result + '" alt="Profile" class="w-full h-full object-cover">';
-                        }
-                    }
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-    }
 });
 
-// API Token Management Functions
-function loadApiTokens() {
-    fetch('/api/tokens', {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + getAuthToken(),
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        const container = document.getElementById('tokensContainer');
-        if (data.success && data.tokens.length > 0) {
-            container.innerHTML = data.tokens.map(token => `
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                        <h5 class="font-medium text-gray-900">${token.name}</h5>
-                        <p class="text-sm text-gray-500">Created: ${new Date(token.created_at).toLocaleDateString()}</p>
-                        ${token.last_used_at ? `<p class="text-xs text-gray-400">Last used: ${new Date(token.last_used_at).toLocaleDateString()}</p>` : ''}
-                    </div>
-                    <button onclick="revokeToken(${token.id})" class="px-3 py-1 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded">
-                        Revoke
-                    </button>
-                </div>
-            `).join('');
-        } else {
-            container.innerHTML = '<p class="text-gray-500 text-sm">No API tokens found. Create one above to get started.</p>';
-        }
-    })
-    .catch(error => {
-        console.error('Error loading tokens:', error);
-        document.getElementById('tokensContainer').innerHTML = '<p class="text-red-500 text-sm">Error loading tokens. Please refresh the page.</p>';
-    });
-}
-
-function getAuthToken() {
-    // Try to get token from localStorage or sessionStorage
-    return localStorage.getItem('api_token') || sessionStorage.getItem('api_token') || '';
-}
-
-// Handle token creation form
-document.addEventListener('DOMContentLoaded', function() {
-    const createTokenForm = document.getElementById('createTokenForm');
-    if (createTokenForm) {
-        createTokenForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const tokenName = document.getElementById('tokenName').value.trim();
-            if (!tokenName) {
-                showNotification('Please enter a token name', 'error');
-                return;
-            }
-            
-            fetch('/api/tokens', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + getAuthToken(),
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    token_name: tokenName
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show the token to the user
-                    showTokenModal(data.token, tokenName);
-                    document.getElementById('tokenName').value = '';
-                    loadApiTokens(); // Reload the tokens list
-                } else {
-                    showNotification('Error creating token: ' + (data.message || 'Unknown error'), 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error creating token:', error);
-                showNotification('Error creating token. Please try again.', 'error');
-            });
-        });
-    }
-});
-
-function showTokenModal(token, tokenName) {
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-    modal.innerHTML = `
-        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">API Token Created</h3>
-            <p class="text-sm text-gray-600 mb-4">Your new token for "${tokenName}" has been created. Copy it now - you won't be able to see it again!</p>
-            <div class="bg-gray-100 p-3 rounded border mb-4">
-                <code class="text-sm break-all">${token}</code>
-            </div>
-            <div class="flex space-x-3">
-                <button onclick="copyTokenToClipboard('${token}')" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                    Copy Token
-                </button>
-                <button onclick="closeTokenModal()" class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
-                    Close
-                </button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-}
-
-function copyTokenToClipboard(token) {
-    navigator.clipboard.writeText(token).then(() => {
-        showNotification('Token copied to clipboard!', 'success');
-        closeTokenModal();
-    });
-}
-
-function closeTokenModal() {
-    const modal = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-50');
-    if (modal) {
-        modal.remove();
-    }
-}
-
-function revokeToken(tokenId) {
-    if (!confirm('Are you sure you want to revoke this token? This action cannot be undone.')) {
-        return;
-    }
-    
-    fetch(`/api/tokens/${tokenId}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': 'Bearer ' + getAuthToken(),
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showNotification('Token revoked successfully', 'success');
-            loadApiTokens(); // Reload the tokens list
-        } else {
-            showNotification('Error revoking token: ' + (data.message || 'Unknown error'), 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error revoking token:', error);
-        showNotification('Error revoking token. Please try again.', 'error');
-    });
-}
 
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
@@ -595,5 +387,157 @@ function showNotification(message, type = 'info') {
         }, 300);
     }, 3000);
 }
+
+// Danger Zone Functions
+function confirmResetData() {
+    console.log('Reset data confirmation clicked');
+    openModal('resetDataModal');
+}
+
+function confirmDeleteAccount() {
+    console.log('Delete account confirmation clicked');
+    openModal('deleteAccountModal');
+}
+
+// Modal Functions
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function resetAllData() {
+    console.log('Resetting all data...');
+    closeModal('resetDataModal');
+    
+    // Create and submit a form to use proper flash messages
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ route("settings.reset-data") }}';
+    form.style.display = 'none';
+    
+    // Add CSRF token
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = '_token';
+    csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    form.appendChild(csrfToken);
+    
+    // Add to page and submit
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function deleteAccount() {
+    console.log('Deleting account...');
+    closeModal('deleteAccountModal');
+    
+    // Create and submit a form to use proper flash messages
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ route("settings.delete-account") }}';
+    form.style.display = 'none';
+    
+    // Add CSRF token
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = '_token';
+    csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    form.appendChild(csrfToken);
+    
+    // Add to page and submit
+    document.body.appendChild(form);
+    form.submit();
+}
 </script>
+
+<!-- Reset Data Modal -->
+<div id="resetDataModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Reset All Data</h3>
+                        <p class="text-sm text-gray-600">This will permanently delete all your data</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('resetDataModal')" class="text-gray-400 hover:text-gray-600 cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="bg-red-50 rounded-lg p-4 mb-6">
+                <p class="text-sm text-red-800">
+                    <strong>Warning:</strong> This action cannot be undone. All your companies, deals, and interactions will be permanently deleted. Your account will remain intact.
+                </p>
+            </div>
+            
+            <div class="flex space-x-3">
+                <button onclick="resetAllData()" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                    Yes, Reset All Data
+                </button>
+                <button onclick="closeModal('resetDataModal')" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div id="deleteAccountModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Delete Account</h3>
+                        <p class="text-sm text-gray-600">This will permanently delete your account</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('deleteAccountModal')" class="text-gray-400 hover:text-gray-600 cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="bg-red-50 rounded-lg p-4 mb-6">
+                <p class="text-sm text-red-800">
+                    <strong>Final Warning:</strong> This action cannot be undone. Your account and all associated data will be permanently deleted. You will be logged out immediately.
+                </p>
+            </div>
+            
+            <div class="flex space-x-3">
+                <button onclick="deleteAccount()" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                    Yes, Delete Account
+                </button>
+                <button onclick="closeModal('deleteAccountModal')" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

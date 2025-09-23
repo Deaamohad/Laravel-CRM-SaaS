@@ -12,29 +12,10 @@ class CompaniesController extends Controller
         // Get the current user
         $user = \Illuminate\Support\Facades\Auth::user();
         
-        // Get companies associated with the user:
-        // 1. Companies created by the user
-        // 2. The company the user belongs to
-        // 3. Companies that have deals created by the user
-        // 4. Companies that have interactions created by the user
-        $query = Company::where(function($q) use ($user) {
-            // Companies user created or belongs to
-            if ($user->company_id) {
-                $q->where('id', $user->company_id)
-                  ->orWhere('user_id', $user->id);
-            } else {
-                $q->where('user_id', $user->id);
-            }
-        })
-        ->orWhereHas('deals', function($q) use ($user) {
-            $q->where('user_id', $user->id);
-        })
-        ->orWhereHas('interactions', function($q) use ($user) {
-            $q->where('user_id', $user->id);
-        });
-        
-        // Get distinct companies and paginate
-        $companies = $query->distinct()->paginate(10);
+        // Get companies created by the user only
+        $companies = Company::where('user_id', $user->id)
+            ->latest()
+            ->paginate(10);
         
         return view('companies.index', compact('companies'));
     }

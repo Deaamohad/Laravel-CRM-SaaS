@@ -27,7 +27,7 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
-        $token = $user->createToken('api-token', ['*'], now()->addDays(7))->plainTextToken;
+        $token = $user->createToken('api-token', ['*'], now()->addDays(30))->plainTextToken;
 
         return response()->json([
             'success' => true,
@@ -39,7 +39,7 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'company_id' => $user->company_id,
             ],
-            'expires_at' => now()->addDays(7)->toISOString(),
+            'expires_at' => now()->addDays(30)->toISOString(),
         ]);
     }
 
@@ -93,7 +93,7 @@ class AuthController extends Controller
             'message' => 'Token created successfully',
             'token' => $token,
             'token_name' => $request->token_name,
-            'expires_at' => now()->addDays(7)->toISOString(),
+            'expires_at' => now()->addDays(30)->toISOString(),
         ]);
     }
 

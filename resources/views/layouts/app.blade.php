@@ -31,7 +31,7 @@
         </button>
 
         <!-- Sidebar -->
-        <div id="sidebar" class="w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out fixed md:relative z-40 h-full">
+        <div id="sidebar" class="w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out fixed md:relative z-40 min-h-screen flex flex-col">
             <div class="flex items-center justify-center h-16 border-b border-gray-200">
                 <div class="flex items-center space-x-3">
                     <img src="{{ asset('images/Logo.svg') }}" alt="Logo" class="w-8 h-8">
@@ -41,7 +41,7 @@
                 </div>
             </div>
             
-            <nav class="mt-8">
+            <nav class="mt-8 flex-1">
                 <div class="px-4 space-y-2">
                     <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('dashboard') ? 'text-gray-700 bg-blue-50 border-r-4 border-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} rounded-l-lg transition-colors">
                         <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -86,6 +86,14 @@
                     </a>
                 </div>
             </nav>
+            
+            <!-- Sidebar Footer -->
+            <div class="mt-auto p-4 border-t border-gray-200">
+                <div class="text-xs text-gray-500 text-center">
+                    <p>© {{ date('Y') }} Cliento CRM</p>
+                    <p class="mt-1">Version 1.0.0</p>
+                </div>
+            </div>
         </div>
 
         <!-- Main Content -->

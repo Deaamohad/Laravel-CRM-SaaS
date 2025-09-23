@@ -4,44 +4,44 @@
 
 @section('content')
 <div class="p-6">
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Deals</h1>
             <p class="text-gray-600">Track your sales pipeline</p>
         </div>
-        <button onclick="openModal('createDealModal')" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all cursor-pointer">
+        <button onclick="openModal('createDealModal')" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all cursor-pointer w-full sm:w-auto">
             Create Deal
         </button>
     </div>
     <!-- Flash Messages are handled in the layout -->
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
             <div class="flex items-center">
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
                     </svg>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Total Deals</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $deals->total() }}</p>
+                <div class="ml-3 sm:ml-4">
+                    <p class="text-xs sm:text-sm font-medium text-gray-600">Total Deals</p>
+                    <p class="text-lg sm:text-2xl font-bold text-gray-900">{{ $deals->total() }}</p>
                 </div>
             </div>
         </div>
         
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
             <div class="flex items-center">
-                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
                     </svg>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Total Revenue</p>
-                    <p class="text-2xl font-bold text-gray-900">${{ number_format($deals->sum('value'), 0) }}</p>
+                <div class="ml-3 sm:ml-4">
+                    <p class="text-xs sm:text-sm font-medium text-gray-600">Total Revenue</p>
+                    <p class="text-lg sm:text-2xl font-bold text-gray-900">${{ number_format($deals->sum('value'), 0) }}</p>
                 </div>
             </div>
         </div>
@@ -55,7 +55,58 @@
             <h3 class="text-lg font-semibold text-gray-900">All Deals</h3>
         </div>
         
-        <div class="overflow-x-auto">
+        <!-- Mobile Card View -->
+        <div class="block md:hidden">
+            @forelse($deals as $deal)
+            <div class="border-b border-gray-200 p-4 hover:bg-gray-50 cursor-pointer" onclick="window.location.href='{{ route('companies.show', $deal->company) }}'">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex-1">
+                        <h3 class="text-sm font-medium text-gray-900 mb-1">{{ $deal->title }}</h3>
+                        <div class="flex items-center mb-2">
+                            <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-2">
+                                <span class="text-white font-semibold text-xs">{{ substr($deal->company->name, 0, 1) }}</span>
+                            </div>
+                            <span class="text-sm text-gray-600">{{ $deal->company->name }}</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-bold text-gray-900">${{ number_format($deal->value, 0) }}</div>
+                        <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full
+                            @if($deal->stage === 'closed') bg-green-100 text-green-800
+                            @elseif($deal->stage === 'new') bg-yellow-100 text-yellow-800
+                            @else bg-gray-100 text-gray-800
+                            @endif">
+                            {{ ucfirst($deal->stage) }}
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                    <span>{{ $deal->created_at->format('M d, Y') }}</span>
+                    <div class="flex space-x-2" onclick="event.stopPropagation()">
+                        <button onclick="editDeal({{ $deal->id }}, event)" class="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded text-xs">
+                            Edit
+                        </button>
+                        <button onclick="deleteDeal({{ $deal->id }}, event)" class="px-2 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded text-xs">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="p-8 text-center">
+                <div class="text-gray-500">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <p class="text-lg font-medium">No deals yet</p>
+                    <p class="text-sm">Start tracking your sales pipeline by creating your first deal.</p>
+                </div>
+            </div>
+            @endforelse
+        </div>
+
+        <!-- Desktop Table View -->
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-gray-50">
                     <tr>

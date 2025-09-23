@@ -18,73 +18,42 @@ class DashboardController extends Controller
         $user = Auth::user();
         $companyId = $user->company_id;
         
-        // Get dashboard statistics with optimized queries, filtered by user or their company
+        // Get dashboard statistics - simplified and accurate
         $stats = [
-            'total_companies' => Company::where(function($query) use ($user) {
-                if ($user->company_id) {
-                    $query->where('id', $user->company_id)
-                          ->orWhere('user_id', $user->id);
-                } else {
-                    $query->where('user_id', $user->id);
-                }
-            })->count(),
-            'total_deals' => Deal::where(function($query) use ($user) {
-                $query->where('user_id', $user->id)
-                      ->orWhere('company_id', $user->company_id);
-            })->count(),
-            'deals_closed_this_month' => Deal::where(function($query) use ($user) {
-                $query->where('user_id', $user->id)
-                      ->orWhere('company_id', $user->company_id);
-            })
+            // Total companies: companies created by the user
+            'total_companies' => Company::where('user_id', $user->id)->count(),
+            
+            // Total deals: deals created by the user
+            'total_deals' => Deal::where('user_id', $user->id)->count(),
+            
+            // Deals closed this month
+            'deals_closed_this_month' => Deal::where('user_id', $user->id)
                 ->where('stage', 'closed-won')
                 ->whereMonth('created_at', Carbon::now()->month)
                 ->whereYear('created_at', Carbon::now()->year)
                 ->count(),
-            'total_revenue' => Deal::where(function($query) use ($user) {
-                $query->where('user_id', $user->id)
-                      ->orWhere('company_id', $user->company_id);
-            })
-                ->where('stage', 'closed-won')
+            
+            // Total revenue from all deals (not just closed ones)
+            'total_revenue' => Deal::where('user_id', $user->id)
                 ->sum('value'),
-            'pending_deals' => Deal::where(function($query) use ($user) {
-                $query->where('user_id', $user->id)
-                      ->orWhere('company_id', $user->company_id);
-            })
+            
+            // Pending deals
+            'pending_deals' => Deal::where('user_id', $user->id)
                 ->where('stage', 'new')
                 ->count(),
+            
+            // Recent interactions
             'recent_interactions' => Interaction::with(['company:id,name', 'user:id,name'])
-                ->where(function($query) use ($user) {
-                    $query->where('user_id', $user->id)
-                          ->orWhere('company_id', $user->company_id);
-                })
+                ->where('user_id', $user->id)
                 ->latest()
                 ->take(5)
                 ->get(),
         ];
         
-        // Get ALL companies that the user has access to:
-        // 1. Companies created by the user
-        // 2. The company the user belongs to
-        // 3. Companies that have deals created by the user
-        // 4. Companies that have interactions created by the user
-        $recent_companies = Company::where(function($query) use ($user) {
-            // Companies user created or belongs to
-            if ($user->company_id) {
-                $query->where('id', $user->company_id)
-                      ->orWhere('user_id', $user->id);
-            } else {
-                $query->where('user_id', $user->id);
-            }
-        })
-        ->orWhereHas('deals', function($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
-        ->orWhereHas('interactions', function($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
-        ->orderBy('name')
-        ->distinct()
-        ->get();
+        // Get companies created by the user
+        $recent_companies = Company::where('user_id', $user->id)
+            ->orderBy('name')
+            ->get();
         
         // Debug logging
         \Illuminate\Support\Facades\Log::info('Dashboard loaded companies', [
@@ -94,23 +63,17 @@ class DashboardController extends Controller
             'companies' => $recent_companies->pluck('name', 'id')
         ]);
         
-        // Get recent deals with company relationship
+        // Get recent deals created by the user
         $recent_deals = Deal::with('company:id,name')
-            ->where(function($query) use ($user) {
-                $query->where('user_id', $user->id)
-                      ->orWhere('company_id', $user->company_id);
-            })
+            ->where('user_id', $user->id)
             ->latest()
             ->take(5)
             ->get();
         
-        // Calculate conversion rate with safety check
-        $total_deals = $stats['total_deals'];
-        $closed_deals = Deal::where(function($query) use ($user) {
-            $query->where('user_id', $user->id)
-                  ->orWhere('company_id', $user->company_id);
-        })->where('stage', 'closed-won')->count();
-        $stats['conversion_rate'] = $total_deals > 0 ? round(($closed_deals / $total_deals) * 100, 1) : 0;
+        // Calculate active deals (deals that are not closed-won or closed-lost)
+        $stats['active_deals'] = Deal::where('user_id', $user->id)
+            ->whereNotIn('stage', ['closed-won', 'closed-lost'])
+            ->count();
         
         // Get monthly deal data for chart (optimized with single query) - filtering by user or their company
         $monthly_deals = [];
@@ -118,10 +81,7 @@ class DashboardController extends Controller
         $end_date = Carbon::now()->endOfMonth();
         
         $monthly_data = Deal::selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as deals')
-            ->where(function($query) use ($user) {
-                $query->where('user_id', $user->id)
-                      ->orWhere('company_id', $user->company_id);
-            })
+            ->where('user_id', $user->id)
             ->whereBetween('created_at', [$start_date, $end_date])
             ->groupBy('year', 'month')
             ->orderBy('year')
@@ -149,10 +109,8 @@ class DashboardController extends Controller
         // Get the current user
         $user = Auth::user();
         
-        // Filter companies by the logged-in user's company_id
-        $companies = Company::when($user->company_id, function($query) use ($user) {
-            return $query->where('id', $user->company_id);
-        })->latest()->paginate(15);
+        // Filter companies by the logged-in user's user_id
+        $companies = Company::where('user_id', $user->id)->latest()->paginate(15);
         return view('companies.index', compact('companies'));
     }
 
@@ -161,10 +119,7 @@ class DashboardController extends Controller
         // Get the current user
         $user = Auth::user();
         $deals = Deal::with('company')
-            ->where(function($query) use ($user) {
-                $query->where('user_id', $user->id)
-                      ->orWhere('company_id', $user->company_id);
-            })
+            ->where('user_id', $user->id)
             ->latest()
             ->paginate(15);
         return view('deals.index', compact('deals'));
@@ -175,10 +130,7 @@ class DashboardController extends Controller
         // Get the current user
         $user = Auth::user();
         $interactions = Interaction::with('company')
-            ->where(function($query) use ($user) {
-                $query->where('user_id', $user->id)
-                      ->orWhere('company_id', $user->company_id);
-            })
+            ->where('user_id', $user->id)
             ->latest()
             ->paginate(15);
         return view('interactions.index', compact('interactions'));
@@ -189,24 +141,10 @@ class DashboardController extends Controller
         // Get the current user
         $user = Auth::user();
         
-        // Get all companies that the user has access to (including those related through deals/interactions)
-        $companies = Company::where(function($query) use ($user) {
-            // Companies user created or belongs to
-            if ($user->company_id) {
-                $query->where('id', $user->company_id)
-                      ->orWhere('user_id', $user->id);
-            } else {
-                $query->where('user_id', $user->id);
-            }
-        })
-        ->orWhereHas('deals', function($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
-        ->orWhereHas('interactions', function($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
-        ->distinct()
-        ->paginate(15);
+        // Get companies created by the user
+        $companies = Company::where('user_id', $user->id)
+            ->latest()
+            ->paginate(15);
         
         return view('companies.index', compact('companies'));
     }
@@ -313,19 +251,9 @@ class DashboardController extends Controller
             $validated['stage'] = $validated['stage'] ?? 'new';
             $validated['user_id'] = $user->id;
             
-            // Make sure the company belongs to the user or has related deals/interactions
+            // Make sure the company belongs to the user
             $company = Company::where('id', $validated['company_id'])
-                ->where(function($query) use ($user) {
-                    // Direct ownership
-                    $query->where('user_id', $user->id)
-                          ->orWhere('id', $user->company_id);
-                })
-                ->orWhereHas('deals', function($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                })
-                ->orWhereHas('interactions', function($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                })
+                ->where('user_id', $user->id)
                 ->first();
                 
             if (!$company) {
@@ -400,19 +328,9 @@ class DashboardController extends Controller
             throw $e; // Re-throw for normal form submissions to use Laravel's default handling
         }
 
-        // Make sure the company belongs to the user or has related deals/interactions
+        // Make sure the company belongs to the user
         $company = Company::where('id', $validated['company_id'])
-            ->where(function($query) use ($user) {
-                // Direct ownership
-                $query->where('user_id', $user->id)
-                      ->orWhere('id', $user->company_id);
-            })
-            ->orWhereHas('deals', function($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
-            ->orWhereHas('interactions', function($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
+            ->where('user_id', $user->id)
             ->first();
             
         if (!$company) {

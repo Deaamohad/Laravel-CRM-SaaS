@@ -26,23 +26,10 @@ class SettingsController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
-            'job_title' => 'nullable|string|max:255',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'job_title' => 'nullable|string|max:255'
         ];
         
         $validatedData = $request->validate($rules);
-        
-        // Handle avatar upload if present
-        if ($request->hasFile('avatar')) {
-            // Delete old avatar if exists
-            if ($user->avatar && Storage::exists('public/avatars/' . $user->avatar)) {
-                Storage::delete('public/avatars/' . $user->avatar);
-            }
-            
-            $avatarName = time() . '.' . $request->avatar->extension();
-            $request->avatar->storeAs('public/avatars', $avatarName);
-            $validatedData['avatar'] = $avatarName;
-        }
         
         $user->update($validatedData);
         
@@ -56,32 +43,55 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function resetData()
+    public function resetData(Request $request)
     {
         try {
-            // Clear all data from tables
-            DB::table('interactions')->delete();
-            DB::table('deals')->delete();
-            DB::table('companies')->delete();
+            $user = Auth::user();
             
-            return response()->json(['success' => true, 'message' => 'All data has been reset successfully']);
+            if (!$user) {
+                return redirect()->back()->withErrors(['error' => 'User not authenticated'])->with('active_tab', 'security');
+            }
+            
+            // Clear only the current user's data (order matters due to foreign key constraints)
+            // First delete interactions (they reference deals and companies)
+            $interactionsDeleted = DB::table('interactions')->where('user_id', $user->id)->delete();
+            // Then delete deals (they reference companies)
+            $dealsDeleted = DB::table('deals')->where('user_id', $user->id)->delete();
+            // Finally delete companies
+            $companiesDeleted = DB::table('companies')->where('user_id', $user->id)->delete();
+            
+            return redirect()->route('settings.index')->with([
+                'success' => 'All your data has been reset successfully (Interactions: ' . $interactionsDeleted . ', Deals: ' . $dealsDeleted . ', Companies: ' . $companiesDeleted . ')',
+                'active_tab' => 'security'
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error resetting data: ' . $e->getMessage()]);
+            \Log::error('Reset data error: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Error resetting data: ' . $e->getMessage()])->with('active_tab', 'security');
         }
     }
 
-    public function deleteAccount()
+    public function deleteAccount(Request $request)
     {
         try {
-            // In a real app, you'd delete the user and all related data
-            // For demo purposes, we'll just clear all data
-            DB::table('interactions')->delete();
-            DB::table('deals')->delete();
-            DB::table('companies')->delete();
+            $user = Auth::user();
             
-            return response()->json(['success' => true, 'message' => 'Account deletion initiated. All data has been cleared.']);
+            // Delete only the current user's data (order matters due to foreign key constraints)
+            // First delete interactions (they reference deals and companies)
+            DB::table('interactions')->where('user_id', $user->id)->delete();
+            // Then delete deals (they reference companies)
+            DB::table('deals')->where('user_id', $user->id)->delete();
+            // Finally delete companies
+            DB::table('companies')->where('user_id', $user->id)->delete();
+            
+            // Delete the user account
+            DB::table('users')->where('id', $user->id)->delete();
+            
+            // Logout the user
+            Auth::logout();
+            
+            return redirect()->route('login')->with('success', 'Your account has been deleted successfully');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error deleting account: ' . $e->getMessage()]);
+            return redirect()->back()->withErrors(['error' => 'Error deleting account: ' . $e->getMessage()])->with('active_tab', 'security');
         }
     }
     
@@ -118,4 +128,5 @@ class SettingsController extends Controller
             return redirect()->back()->withErrors(['current_password' => 'The current password is incorrect.'])->withInput()->with('active_tab', 'security');
         }
     }
+    
 }

@@ -34,22 +34,8 @@ class CompanyController extends Controller
         $sortBy = $request->get('sort_by', 'created_at');
         $sortOrder = $request->get('sort_order', 'desc');
         
-        // Start building the query with proper authorization
-        $query = Company::where(function($q) use ($user) {
-            // Companies user created or belongs to
-            if ($user->company_id) {
-                $q->where('id', $user->company_id)
-                  ->orWhere('user_id', $user->id);
-            } else {
-                $q->where('user_id', $user->id);
-            }
-        })
-        ->orWhereHas('deals', function($q) use ($user) {
-            $q->where('user_id', $user->id);
-        })
-        ->orWhereHas('interactions', function($q) use ($user) {
-            $q->where('user_id', $user->id);
-        });
+        // Start building the query with proper authorization - only user's companies
+        $query = Company::where('user_id', $user->id);
         
         // Apply search filter
         if ($search) {

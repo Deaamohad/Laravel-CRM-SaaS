@@ -24,13 +24,8 @@ class InteractionController extends Controller
         // Get interactions that the user has access to
         $query = Interaction::with(['company', 'deal']);
         
-        if ($user->company_id) {
-            // User belongs to a company - show interactions from their company
-            $query->where('company_id', $user->company_id);
-        } else {
-            // User doesn't belong to a company - show interactions they created
-            $query->where('user_id', $user->id);
-        }
+        // Show only interactions the user created
+        $query->where('user_id', $user->id);
         
         $interactions = $query->latest()->paginate(15);
             

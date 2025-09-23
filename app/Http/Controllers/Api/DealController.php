@@ -25,13 +25,8 @@ class DealController extends Controller
         // Get deals that the user has access to
         $query = Deal::with('company');
         
-        if ($user->company_id) {
-            // User belongs to a company - show deals from their company
-            $query->where('company_id', $user->company_id);
-        } else {
-            // User doesn't belong to a company - show deals they created
-            $query->where('user_id', $user->id);
-        }
+        // Show only deals the user created
+        $query->where('user_id', $user->id);
         
         $deals = $query->latest()->paginate(15);
             

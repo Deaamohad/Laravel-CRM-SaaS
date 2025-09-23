@@ -75,6 +75,7 @@ Route::middleware('auth')->group(function () {
     Route::post('settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password');
     Route::post('settings/reset-data', [SettingsController::class, 'resetData'])->name('settings.reset-data');
     Route::post('settings/delete-account', [SettingsController::class, 'deleteAccount'])->name('settings.delete-account');
+    
 
     // Company CRUD Routes
     Route::post('companies', [CompaniesController::class, 'store'])->name('companies.store');

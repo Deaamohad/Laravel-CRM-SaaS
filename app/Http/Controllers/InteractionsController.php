@@ -14,38 +14,16 @@ class InteractionsController extends Controller
         // Get the current user
         $user = Auth::user();
         
-        // Get only interactions associated with the current user or their company
+        // Get interactions created by the current user
         $interactions = Interaction::with(['company', 'user'])
-            ->where(function($query) use ($user) {
-                $query->where('user_id', $user->id)
-                      ->orWhere('company_id', $user->company_id);
-            })
+            ->where('user_id', $user->id)
             ->latest('interaction_date')
             ->paginate(10);
             
-        // Show ALL companies that the user has access to:
-        // 1. Companies created by the user
-        // 2. The company the user belongs to
-        // 3. Companies that have deals created by the user
-        // 4. Companies that have interactions created by the user
-        $companies = Company::where(function($query) use ($user) {
-            // Companies user created or belongs to
-            if ($user->company_id) {
-                $query->where('id', $user->company_id)
-                      ->orWhere('user_id', $user->id);
-            } else {
-                $query->where('user_id', $user->id);
-            }
-        })
-        ->orWhereHas('deals', function($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
-        ->orWhereHas('interactions', function($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
-        ->orderBy('name')
-        ->distinct()
-        ->get();
+        // Get companies created by the user
+        $companies = Company::where('user_id', $user->id)
+            ->orderBy('name')
+            ->get();
         
         return view('interactions.index', compact('interactions', 'companies'));
     }
@@ -147,14 +125,10 @@ class InteractionsController extends Controller
                 'notes' => 'nullable|string|max:2000'
             ]);
             
-            // Ensure the company_id is valid - either:
-            // 1. A company the user created, or
-            // 2. The user's own company
+            // Ensure the company_id is valid - only companies the user created
             $companyAccess = Company::where('id', $request->company_id)
-                ->where(function($query) use ($user) {
-                    $query->where('user_id', $user->id)
-                        ->orWhere('id', $user->company_id);
-                })->exists();
+                ->where('user_id', $user->id)
+                ->exists();
                 
             if (!$companyAccess) {
                 if ($request->ajax() || $request->wantsJson()) {

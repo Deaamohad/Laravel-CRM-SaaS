@@ -59,12 +59,12 @@
             </div>
         </div>
 
-        <!-- Conversion Rate -->
+        <!-- Active Deals -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs md:text-sm font-medium text-gray-600">Conversion Rate</p>
-                    <p class="text-xl md:text-3xl font-bold text-gray-900 conversion-rate">{{ $stats['conversion_rate'] }}%</p>
+                    <p class="text-xs md:text-sm font-medium text-gray-600">Active Deals</p>
+                    <p class="text-xl md:text-3xl font-bold text-gray-900 active-deals">{{ $stats['total_deals'] - $stats['deals_closed_this_month'] }}</p>
                 </div>
                 <div class="w-8 h-8 md:w-12 md:h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                     <svg class="w-4 h-4 md:w-6 md:h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">

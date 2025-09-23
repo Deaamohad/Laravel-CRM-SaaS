@@ -14,38 +14,16 @@ class DealsController extends Controller
         // Get the current user
         $user = Auth::user();
         
-        // Get only deals associated with the current user or their company
+        // Get deals created by the current user
         $deals = Deal::with('company')
-            ->where(function($query) use ($user) {
-                $query->where('user_id', $user->id)
-                      ->orWhere('company_id', $user->company_id);
-            })
-            ->latest('created_at') // Order by latest created deals first
+            ->where('user_id', $user->id)
+            ->latest('created_at')
             ->paginate(10);
             
-        // Show ALL companies that the user has access to:
-        // 1. Companies created by the user
-        // 2. The company the user belongs to
-        // 3. Companies that have deals created by the user
-        // 4. Companies that have interactions created by the user
-        $companies = Company::where(function($query) use ($user) {
-            // Companies user created or belongs to
-            if ($user->company_id) {
-                $query->where('id', $user->company_id)
-                      ->orWhere('user_id', $user->id);
-            } else {
-                $query->where('user_id', $user->id);
-            }
-        })
-        ->orWhereHas('deals', function($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
-        ->orWhereHas('interactions', function($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
-        ->orderBy('name')
-        ->distinct()
-        ->get();
+        // Get companies created by the user
+        $companies = Company::where('user_id', $user->id)
+            ->orderBy('name')
+            ->get();
         
         return view('deals.index', compact('deals', 'companies'));
     }
@@ -114,22 +92,8 @@ class DealsController extends Controller
         // Ensure the company data is fully loaded
         $deal->load('company');
         
-        // Get available companies for the dropdown
-        $companies = Company::where(function($query) use ($user) {
-            // Companies user created or belongs to
-            if ($user->company_id) {
-                $query->where('id', $user->company_id)
-                      ->orWhere('user_id', $user->id);
-            } else {
-                $query->where('user_id', $user->id);
-            }
-        })
-        ->orWhereHas('deals', function($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
-        ->orWhereHas('interactions', function($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
+        // Get available companies for the dropdown (only user's companies)
+        $companies = Company::where('user_id', $user->id)
         ->orderBy('name')
         ->distinct()
         ->get();
@@ -157,14 +121,10 @@ class DealsController extends Controller
             'stage' => 'required|in:lead,qualified,proposal,negotiation,closed-won,closed-lost'
         ]);
         
-        // Ensure the company_id is valid - either:
-        // 1. A company the user created, or
-        // 2. The user's own company
+        // Ensure the company_id is valid - only companies the user created
         $companyAccess = Company::where('id', $request->company_id)
-            ->where(function($query) use ($user) {
-                $query->where('user_id', $user->id)
-                    ->orWhere('id', $user->company_id);
-            })->exists();
+            ->where('user_id', $user->id)
+            ->exists();
             
         if (!$companyAccess) {
             return response()->json(['success' => false, 'message' => 'You can only assign deals to companies you have access to'], 403);

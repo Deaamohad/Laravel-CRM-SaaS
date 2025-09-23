@@ -38,28 +38,190 @@
         <!-- Trusted Companies -->
         <div class="text-center mb-16">
             <p class="text-gray-500 text-lg font-medium mb-8">Trusted by 10,000+ businesses worldwide</p>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center opacity-60">
-                <!-- Company Logos -->
-                <div class="flex items-center justify-center h-12">
-                    <div class="bg-gray-300 rounded px-8 py-3 text-gray-600 font-bold text-sm">TechCorp</div>
-                </div>
-                <div class="flex items-center justify-center h-12">
-                    <div class="bg-gray-300 rounded px-8 py-3 text-gray-600 font-bold text-sm">InnovateLabs</div>
-                </div>
-                <div class="flex items-center justify-center h-12">
-                    <div class="bg-gray-300 rounded px-8 py-3 text-gray-600 font-bold text-sm">GlobalSales</div>
-                </div>
-                <div class="flex items-center justify-center h-12">
-                    <div class="bg-gray-300 rounded px-8 py-3 text-gray-600 font-bold text-sm">BizGrow</div>
-                </div>
-                <div class="flex items-center justify-center h-12">
-                    <div class="bg-gray-300 rounded px-8 py-3 text-gray-600 font-bold text-sm">DataFlow</div>
-                </div>
-                <div class="flex items-center justify-center h-12">
-                    <div class="bg-gray-300 rounded px-8 py-3 text-gray-600 font-bold text-sm">CloudSync</div>
+            
+            <!-- Improved Auto-scrolling Logo Carousel with JavaScript -->
+            <div id="logo-carousel" class="relative">
+                <!-- Gradient overlays for smooth fade effect -->
+                <div class="absolute left-0 top-0 h-full w-20 bg-gradient-to-r from-white to-transparent z-10"></div>
+                <div class="absolute right-0 top-0 h-full w-20 bg-gradient-to-l from-white to-transparent z-10"></div>
+                
+                <!-- Logo tracks with JavaScript-based infinite scroll -->
+                <div id="logo-marquee" class="overflow-hidden h-40 relative">
+                    <div class="logo-track" id="logo-track-primary">
+                        @for($i = 1; $i <= 11; $i++)
+                        <div class="flex items-center justify-center h-40 group flex-shrink-0 logo-item mx-10">
+                            <img src="{{ asset('images/logos/logos (' . $i . ').png') }}"
+                                 alt="Partner {{ $i }}"
+                                 loading="lazy"
+                                 class="h-28 w-auto object-contain transition-all duration-300 opacity-90 group-hover:opacity-100">
+                        </div>
+                        @endfor
+                    </div>
                 </div>
             </div>
+            
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Set up an improved infinite scroll with multiple clones
+                    function setupImprovedMarquee() {
+                        const marqueeContainer = document.getElementById('logo-marquee');
+                        const track = document.getElementById('logo-track-primary');
+                        
+                        // Make sure the elements exist
+                        if (!track || !marqueeContainer) return;
+                        
+                        // Clear any existing clones first
+                        const existingClones = marqueeContainer.querySelectorAll('.logo-track:not(#logo-track-primary)');
+                        existingClones.forEach(clone => clone.remove());
+                        
+                        // Reset animation and position on primary track
+                        track.style.animation = 'none';
+                        track.style.position = 'absolute';
+                        track.style.left = '0';
+                        track.style.transform = 'translateX(0)';
+                        
+                        // Get the accurate width after images have loaded
+                        const trackWidth = track.offsetWidth;
+                        const containerWidth = marqueeContainer.offsetWidth;
+                        
+                        // Set the container height to match the track
+                        marqueeContainer.style.height = track.offsetHeight + 'px';
+                        
+                        // Calculate how many clones we need to fill viewport plus buffer
+                        // We want at least 3 complete sets to ensure no visual gaps
+                        const numberOfClones = Math.max(3, Math.ceil((containerWidth * 3) / trackWidth));
+                        
+                        // Create multiple clones for a more robust infinite scroll
+                        for (let i = 0; i < numberOfClones; i++) {
+                            const clone = track.cloneNode(true);
+                            clone.id = `logo-track-clone-${i}`;
+                            clone.classList.add('logo-track-clone');
+                            clone.style.position = 'absolute';
+                            clone.style.left = '0'; // All tracks start at left 0
+                            clone.style.transform = `translateX(${trackWidth * (i + 1)}px)`; // Positioned with transform instead
+                            marqueeContainer.appendChild(clone);
+                        }
+                        
+                        // Calculate a good duration - slower for better readability
+                        // The entire carousel should take about 30-40 seconds for one loop
+                        const totalWidth = trackWidth * (numberOfClones + 1);
+                        const duration = totalWidth / 50; // pixels per second
+                        
+                        // Create a smooth continuous scroll with CSS transforms instead of left position
+                        // This eliminates any flickering during repositioning
+                        let scrollPosition = 0;
+                        const scrollSpeed = 0.8; // pixels per frame - adjust for desired speed
+                        
+                        // Set up the continuous scroll animation
+                        function animateScroll() {
+                            // Increment scroll position
+                            scrollPosition += scrollSpeed;
+                            
+                            // If we've scrolled a complete track width, reset to avoid floating point issues
+                            if (scrollPosition >= trackWidth) {
+                                scrollPosition = 0;
+                            }
+                            
+                            // Get all tracks
+                            const allTracks = marqueeContainer.querySelectorAll('.logo-track');
+                            
+                            // Apply the transform to all tracks with an offset
+                            allTracks.forEach((trackElement, index) => {
+                                const basePosition = index * trackWidth; // Each track starts after the previous one
+                                const transformX = -scrollPosition + basePosition;
+                                trackElement.style.transform = `translateX(${transformX}px)`;
+                                
+                                // Check if this track has moved completely off-screen to the left
+                                if (transformX < -trackWidth) {
+                                    // Instead of abrupt reposition, just shift it by the total width of all tracks
+                                    // This creates a seamless loop
+                                    const totalTracksWidth = trackWidth * allTracks.length;
+                                    trackElement.style.transform = `translateX(${transformX + totalTracksWidth}px)`;
+                                }
+                            });
+                            
+                            // Continue the animation
+                            animationId = requestAnimationFrame(animateScroll);
+                        }
+                        
+                        // Start the animation
+                        let animationId = requestAnimationFrame(animateScroll);
+                        
+                        // Pause animations on hover
+                        marqueeContainer.addEventListener('mouseenter', () => {
+                            cancelAnimationFrame(animationId);
+                        });
+                        
+                        marqueeContainer.addEventListener('mouseleave', () => {
+                            animationId = requestAnimationFrame(animateScroll);
+                        });
+                        
+                        // Store the animation ID for cleanup
+                        marqueeContainer.dataset.animationId = animationId;
+                    }
+                    
+                    // Wait for images to load before setting up
+                    const images = document.querySelectorAll('#logo-track-primary img');
+                    if (images.length > 0) {
+                        let loadedCount = 0;
+                        
+                        images.forEach(img => {
+                            if (img.complete) {
+                                loadedCount++;
+                                if (loadedCount === images.length) {
+                                    setupImprovedMarquee();
+                                }
+                            } else {
+                                img.addEventListener('load', () => {
+                                    loadedCount++;
+                                    if (loadedCount === images.length) {
+                                        setupImprovedMarquee();
+                                    }
+                                });
+                                img.addEventListener('error', () => {
+                                    loadedCount++;
+                                    if (loadedCount === images.length) {
+                                        setupImprovedMarquee();
+                                    }
+                                });
+                            }
+                        });
+                        
+                        // Fallback in case images don't load
+                        setTimeout(setupImprovedMarquee, 2000);
+                    } else {
+                        // No images, set up immediately
+                        setupImprovedMarquee();
+                    }
+                    
+                    // Handle window resize for responsiveness
+                    let resizeTimeout;
+                    window.addEventListener('resize', () => {
+                        // Debounce resize event
+                        clearTimeout(resizeTimeout);
+                        resizeTimeout = setTimeout(() => {
+                            // Clean up existing animation
+                            const marqueeContainer = document.getElementById('logo-marquee');
+                            if (marqueeContainer && marqueeContainer.dataset.animationId) {
+                                cancelAnimationFrame(parseInt(marqueeContainer.dataset.animationId));
+                            }
+                            
+                            // Rebuild the marquee
+                            setupImprovedMarquee();
+                        }, 250);
+                    });
+                    
+                    // Clean up when navigating away
+                    window.addEventListener('beforeunload', () => {
+                        const marqueeContainer = document.getElementById('logo-marquee');
+                        if (marqueeContainer && marqueeContainer.dataset.animationId) {
+                            cancelAnimationFrame(parseInt(marqueeContainer.dataset.animationId));
+                        }
+                    });
+                });
+            </script>
         </div>
+        
 
         <!-- Stats Grid -->
         <div class="grid md:grid-cols-4 gap-8 mb-20" id="stats-section">
