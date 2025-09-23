@@ -50,7 +50,7 @@
                     <div class="logo-track" id="logo-track-primary">
                         @for($i = 1; $i <= 11; $i++)
                         <div class="flex items-center justify-center h-40 group flex-shrink-0 logo-item mx-10">
-                            <img src="{{ asset('images/logos/logos (' . $i . ').png') }}"
+                            <img src="{{ asset('images/logos/logos (' . $i . ').png', true) }}"
                                  alt="Partner {{ $i }}"
                                  loading="lazy"
                                  class="h-28 w-auto object-contain transition-all duration-300 opacity-90 group-hover:opacity-100">
@@ -59,6 +59,35 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- CSS Fallback for logo carousel -->
+            <style>
+                /* Basic styling to ensure logos are visible even if JS fails */
+                #logo-track-primary {
+                    display: flex;
+                    flex-wrap: nowrap;
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                    scroll-behavior: smooth;
+                    padding: 20px 0;
+                }
+                
+                .logo-item img {
+                    height: 7rem;
+                    width: auto;
+                    transition: transform 0.3s ease;
+                }
+                
+                .logo-item:hover img {
+                    transform: scale(1.05);
+                }
+                
+                @media (max-width: 640px) {
+                    .logo-item img {
+                        height: 3.5rem;
+                    }
+                }
+            </style>
             
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
@@ -162,25 +191,49 @@
                     
                     // Wait for images to load before setting up
                     const images = document.querySelectorAll('#logo-track-primary img');
+                    
+                    // Debug information
+                    console.log(`Logo carousel: Found ${images.length} logo images`);
+                    if (images.length > 0) {
+                        images.forEach((img, index) => {
+                            console.log(`Logo ${index + 1} src: ${img.src}, complete: ${img.complete}`);
+                        });
+                    }
+                    
                     if (images.length > 0) {
                         let loadedCount = 0;
+                        let errorCount = 0;
                         
-                        images.forEach(img => {
-                            if (img.complete) {
+                        images.forEach((img, index) => {
+                            if (img.complete && img.naturalWidth !== 0) {
+                                console.log(`Logo ${index + 1} already loaded`);
                                 loadedCount++;
-                                if (loadedCount === images.length) {
+                                if (loadedCount + errorCount === images.length) {
+                                    console.log('All logos processed, setting up marquee');
                                     setupImprovedMarquee();
                                 }
                             } else {
                                 img.addEventListener('load', () => {
+                                    console.log(`Logo ${index + 1} loaded successfully`);
                                     loadedCount++;
-                                    if (loadedCount === images.length) {
+                                    if (loadedCount + errorCount === images.length) {
+                                        console.log('All logos processed, setting up marquee');
                                         setupImprovedMarquee();
                                     }
                                 });
                                 img.addEventListener('error', () => {
-                                    loadedCount++;
-                                    if (loadedCount === images.length) {
+                                    console.error(`Error loading logo ${index + 1}: ${img.src}`);
+                                    errorCount++;
+                                    // Try to reload with a corrected path if there's an issue
+                                    if (img.src.includes('http://') || img.src.includes('https://')) {
+                                        // Already has protocol, don't try to fix
+                                    } else {
+                                        // Try without asset helper in case there's an issue with the path
+                                        img.src = `/images/logos/logos (${index + 1}).png`;
+                                    }
+                                    
+                                    if (loadedCount + errorCount === images.length) {
+                                        console.log('All logos processed (with some errors), setting up marquee');
                                         setupImprovedMarquee();
                                     }
                                 });
@@ -188,9 +241,13 @@
                         });
                         
                         // Fallback in case images don't load
-                        setTimeout(setupImprovedMarquee, 2000);
+                        setTimeout(() => {
+                            console.log('Fallback timeout reached, setting up marquee');
+                            setupImprovedMarquee();
+                        }, 2000);
                     } else {
                         // No images, set up immediately
+                        console.warn('No logo images found, setting up empty marquee');
                         setupImprovedMarquee();
                     }
                     
