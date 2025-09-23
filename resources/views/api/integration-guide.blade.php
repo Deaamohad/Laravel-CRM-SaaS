@@ -22,12 +22,8 @@
                 <p class="font-semibold">Your API Endpoint:</p>
                 <code class="text-blue-600">{{ config('app.url') }}/api/companies</code>
                 
-                <p class="font-semibold mt-3">Your API Token:</p>
-                <code class="text-green-600">abc123-your-secret-token</code>
-                
-                <p class="text-sm text-gray-600 mt-2">
-                    Use this token in the Authorization header: <code>Authorization: Bearer abc123-your-secret-token</code>
-                </p>
+                <p class="font-semibold mt-3">Authentication:</p>
+                <p class="text-sm text-gray-600">Use your login credentials to get an API token via the login endpoint.</p>
             </div>
         </div>
 
@@ -44,7 +40,7 @@
                     <div class="bg-gray-900 text-white p-4 rounded-lg text-sm overflow-x-auto">
 <pre>curl -X POST {{ config('app.url') }}/api/companies \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer abc123" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
   -d '{
     "name": "Acme Corporation", 
     "email": "contact@acme.com",
@@ -69,7 +65,7 @@ curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Content-Type: application/json',
-    'Authorization: Bearer abc123'
+    'Authorization: Bearer YOUR_TOKEN'
 ]);
 curl_exec($ch);</pre>
                     </div>
@@ -134,19 +130,26 @@ curl_exec($ch);</pre>
 
     </div>
 
-    <!-- Real Integration Examples -->
+    <!-- API Reference -->
     <div class="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6">
-    <h2 class="text-xl font-semibold mb-4">Companies Already Using Our API</h2>
-        <div class="grid md:grid-cols-2 gap-4">
-            <div class="bg-white p-4 rounded-lg">
-                <h3 class="font-semibold">TechCorp Solutions</h3>
-                <p class="text-sm text-gray-600">"We connected our website forms directly to the CRM. Now every lead is automatically tracked!"</p>
-                <div class="mt-2 text-xs text-blue-600">Integration: Website → API → CRM</div>
+        <h2 class="text-xl font-semibold mb-4">Complete API Reference</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="font-semibold mb-3">Authentication Endpoints</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><code class="bg-white px-2 py-1 rounded">POST /api/login</code> - Get API token</li>
+                    <li><code class="bg-white px-2 py-1 rounded">GET /api/user</code> - Get current user</li>
+                    <li><code class="bg-white px-2 py-1 rounded">POST /api/logout</code> - Revoke token</li>
+                </ul>
             </div>
-            <div class="bg-white p-4 rounded-lg">
-                <h3 class="font-semibold">Marketing Pro Inc</h3>
-                <p class="text-sm text-gray-600">"Our mobile sales team uses a custom app that syncs with your CRM via the API."</p>
-                <div class="mt-2 text-xs text-green-600">Integration: Mobile App → API → CRM</div>
+            <div>
+                <h3 class="font-semibold mb-3">Data Endpoints</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><code class="bg-white px-2 py-1 rounded">GET /api/companies</code> - List companies</li>
+                    <li><code class="bg-white px-2 py-1 rounded">POST /api/companies</code> - Create company</li>
+                    <li><code class="bg-white px-2 py-1 rounded">GET /api/deals</code> - List deals</li>
+                    <li><code class="bg-white px-2 py-1 rounded">GET /api/interactions</code> - List interactions</li>
+                </ul>
             </div>
         </div>
     </div>

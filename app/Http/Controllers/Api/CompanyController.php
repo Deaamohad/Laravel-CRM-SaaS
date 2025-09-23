@@ -19,17 +19,52 @@ class CompanyController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Only show companies for authenticated users within their company scope
+        // Only show companies for authenticated users
         $user = Auth::user();
         
-        if (!$user || !$user->company_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
         
-        // Users should only see their own company
-        $companies = Company::where('id', $user->company_id)->latest()->paginate(15);
+        // Get query parameters for filtering and pagination
+        $perPage = $request->get('per_page', 15);
+        $search = $request->get('search');
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        
+        // Start building the query with proper authorization
+        $query = Company::where(function($q) use ($user) {
+            // Companies user created or belongs to
+            if ($user->company_id) {
+                $q->where('id', $user->company_id)
+                  ->orWhere('user_id', $user->id);
+            } else {
+                $q->where('user_id', $user->id);
+            }
+        })
+        ->orWhereHas('deals', function($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+        ->orWhereHas('interactions', function($q) use ($user) {
+            $q->where('user_id', $user->id);
+        });
+        
+        // Apply search filter
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('industry', 'like', "%{$search}%");
+            });
+        }
+        
+        // Apply sorting
+        $query->orderBy($sortBy, $sortOrder);
+        
+        // Get paginated results
+        $companies = $query->distinct()->paginate($perPage);
         
         return response()->json([
             'success' => true,
@@ -40,6 +75,8 @@ class CompanyController extends Controller
                 'last_page' => $companies->lastPage(),
                 'per_page' => $companies->perPage(),
                 'total' => $companies->total(),
+                'from' => $companies->firstItem(),
+                'to' => $companies->lastItem(),
             ]
         ]);
     }
@@ -49,15 +86,29 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+        
+        // Check if user is authenticated
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        
         $validated = $request->validate([
-            'name'  => 'required|string|max:30',
+            'name'  => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'industry' => 'nullable|string|max:100',
         ]);
 
+        $validated['user_id'] = $user->id;
         $company = Company::create($validated);
 
-        return new CompanyResource($company);
+        return response()->json([
+            'success' => true,
+            'message' => 'Company created successfully',
+            'company' => new CompanyResource($company)
+        ], 201);
     }
 
     /**
@@ -67,17 +118,14 @@ class CompanyController extends Controller
     {
         $user = Auth::user();
         
-        // Check if user is authorized to view this company
-        if (!$user || !$user->company_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        // Check if user is authenticated
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
         
-        // In a multi-tenant app, users can only view their own company
-        if ($company->id !== $user->company_id) {
-            return response()->json([
-                'error' => 'Access denied. You can only view your own company data.',
-                'message' => 'Company not found or you do not have permission to access it.'
-            ], 404); // Return 404 to not reveal that the company exists
+        // Check if user has access to this company
+        if (!$this->checkCompanyAccess($company, $user)) {
+            return response()->json(['error' => 'Access denied'], 403);
         }
         
         return new CompanyResource($company);
@@ -90,21 +138,31 @@ class CompanyController extends Controller
     {
         $user = Auth::user();
         
-        // Check authorization
-        if (!$user || $company->id !== $user->company_id) {
-            return response()->json(['error' => 'Access denied'], 404);
+        // Check if user is authenticated
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
         
         $validated = $request->validate([
-            'name'  => 'sometimes|string|max:30',
+            'name'  => 'sometimes|string|max:255',
             'email' => 'sometimes|email|max:255',
             'phone' => 'sometimes|string|max:20',
+            'address' => 'sometimes|string|max:500',
+            'industry' => 'sometimes|string|max:100',
         ]);
+
+        // Check if user has access to this company
+        if (!$this->checkCompanyAccess($company, $user)) {
+            return response()->json(['error' => 'Access denied'], 403);
+        }
 
         $company->update($validated);
 
-        return new CompanyResource($company);
-
+        return response()->json([
+            'success' => true,
+            'message' => 'Company updated successfully',
+            'company' => new CompanyResource($company)
+        ]);
     }
 
     /**
@@ -114,13 +172,33 @@ class CompanyController extends Controller
     {
         $user = Auth::user();
         
-        // Check authorization
-        if (!$user || $company->id !== $user->company_id) {
-            return response()->json(['error' => 'Access denied'], 404);
+        // Check if user is authenticated
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
         
+        // Check if user has access to this company
+        if (!$this->checkCompanyAccess($company, $user)) {
+            return response()->json(['error' => 'Access denied'], 403);
+        }
+
         $company->delete();
 
-        return response()->json(['message' => 'Company deleted successfully.']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Company deleted successfully'
+        ]);
+    }
+    
+    /**
+     * Check if user has access to a specific company
+     */
+    private function checkCompanyAccess(Company $company, $user)
+    {
+        // User can access companies they created, belong to, or have deals/interactions with
+        return $company->user_id === $user->id || 
+               ($user->company_id && $company->id === $user->company_id) ||
+               $company->deals()->where('user_id', $user->id)->exists() ||
+               $company->interactions()->where('user_id', $user->id)->exists();
     }
 }

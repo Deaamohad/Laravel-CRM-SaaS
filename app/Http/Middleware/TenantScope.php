@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Models\Company;
 use App\Models\Deal;
 use App\Models\Interaction;
-use App\Models\Contact;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,11 +51,12 @@ class TenantScope
             }
         }
 
-        if ($request->route('contact') && $request->route('contact')->company_id !== null && 
-            $companyId !== null && $request->route('contact')->company_id !== $companyId) {
-            // Don't allow access to contacts from other companies
-            abort(403, 'Unauthorized action.');
-        }
+        // Contact model not implemented yet - remove this check
+        // if ($request->route('contact') && $request->route('contact')->company_id !== null && 
+        //     $companyId !== null && $request->route('contact')->company_id !== $companyId) {
+        //     // Don't allow access to contacts from other companies
+        //     abort(403, 'Unauthorized action.');
+        // }
 
         if ($request->route('interaction')) {
             $interaction = $request->route('interaction');

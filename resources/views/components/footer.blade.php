@@ -65,7 +65,7 @@
                         </button>
                     </form>
                     <div id="subscriptionMessage" class="mt-3 text-green-400 text-sm hidden">
-                        ✓ Successfully subscribed!
+                        Successfully subscribed!
                     </div>
                 </div>
             </div>

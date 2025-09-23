@@ -6,13 +6,28 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\DealController;
 use App\Http\Controllers\Api\InteractionController;
+use App\Http\Controllers\Api\AuthController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Authentication routes (public) with strict rate limiting
+Route::middleware('throttle:5,1')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+});
 
-// Companies API - Requires authentication
-Route::middleware('auth:sanctum')->group(function () {
+
+// Protected routes (require authentication) with moderate rate limiting
+Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
+    // User management
+    Route::get('/user', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    
+    // Token management with stricter rate limiting
+    Route::middleware('throttle:10,1')->group(function () {
+        Route::post('/tokens', [AuthController::class, 'createToken']);
+        Route::get('/tokens', [AuthController::class, 'tokens']);
+        Route::delete('/tokens/{tokenId}', [AuthController::class, 'revokeToken']);
+    });
+
+    // Companies API
     Route::get('companies', [CompanyController::class, 'index']);
     Route::post('companies', [CompanyController::class, 'store']);
     Route::get('companies/{company}', [CompanyController::class, 'show']);
@@ -23,10 +38,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('deals', [DealController::class, 'index']);
     Route::post('deals', [DealController::class, 'store']);
     Route::get('deals/{deal}', [DealController::class, 'show']);
+    Route::put('deals/{deal}', [DealController::class, 'update']);
+    Route::delete('deals/{deal}', [DealController::class, 'destroy']);
 
     // Interactions API
     Route::get('interactions', [InteractionController::class, 'index']);
     Route::post('interactions', [InteractionController::class, 'store']);
+    Route::get('interactions/{interaction}', [InteractionController::class, 'show']);
+    Route::put('interactions/{interaction}', [InteractionController::class, 'update']);
+    Route::delete('interactions/{interaction}', [InteractionController::class, 'destroy']);
 
     // Dashboard Stats API
     Route::get('stats', function () {
@@ -100,10 +120,4 @@ Route::middleware('auth:sanctum')->group(function () {
             ]
         ]);
     });
-});
-
-// Protected API endpoints (require authentication in production)
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::put('companies/{company}', [CompanyController::class, 'update'])->name('api.companies.update');
-    Route::delete('companies/{company}', [CompanyController::class, 'destroy'])->name('api.companies.destroy');
 });

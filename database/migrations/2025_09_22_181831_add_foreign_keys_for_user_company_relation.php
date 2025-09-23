@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-        });
-
+        // Create companies foreign key first (no dependency)
         Schema::table('companies', function (Blueprint $table) {
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+        });
+        
+        // Then create users foreign key (depends on companies)
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
         });
     }
 

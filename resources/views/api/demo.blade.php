@@ -428,244 +428,34 @@ function showWebhookModal() {
 </script>
 @endsection
 
-    <!-- Integration Examples -->
+    <!-- Simple Integration Examples -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Real-World Integration Examples</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Integration Examples</h3>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="p-4 border border-blue-200 rounded-lg">
-                <h4 class="font-semibold text-blue-900 mb-2">🏢 Website Integration</h4>
-                <p class="text-sm text-gray-600 mb-3">Contact forms on your website automatically create companies in CRM</p>
+                <h4 class="font-semibold text-blue-900 mb-2">Website Integration</h4>
+                <p class="text-sm text-gray-600 mb-3">Contact forms create companies automatically</p>
                 <code class="text-xs bg-blue-50 p-2 block rounded">
-                    &lt;form action="/api/companies" method="POST"&gt;
+                    POST /api/companies
                 </code>
             </div>
             
             <div class="p-4 border border-green-200 rounded-lg">
-                <h4 class="font-semibold text-green-900 mb-2">📱 Mobile App</h4>
-                <p class="text-sm text-gray-600 mb-3">Sales reps use mobile app to access same data</p>
+                <h4 class="font-semibold text-green-900 mb-2">Mobile App</h4>
+                <p class="text-sm text-gray-600 mb-3">Access CRM data from mobile devices</p>
                 <code class="text-xs bg-green-50 p-2 block rounded">
-                    fetch('/api/companies')
+                    GET /api/companies
                 </code>
             </div>
             
             <div class="p-4 border border-purple-200 rounded-lg">
-                <h4 class="font-semibold text-purple-900 mb-2">🔗 Third-party Tools</h4>
-                <p class="text-sm text-gray-600 mb-3">Zapier, Make.com, or custom integrations</p>
+                <h4 class="font-semibold text-purple-900 mb-2">Third-party Tools</h4>
+                <p class="text-sm text-gray-600 mb-3">Zapier, Make.com integrations</p>
                 <code class="text-xs bg-purple-50 p-2 block rounded">
                     Authorization: Bearer token
                 </code>
             </div>
-        </div>
-    </div>
-
-    <!-- Integration Examples -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <span class="mr-2">🌐</span> Real-World Integration Examples
-        </h3>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="p-4 border border-blue-200 rounded-lg bg-blue-50">
-                <h4 class="font-semibold text-blue-900 mb-2 flex items-center">
-                    <span class="mr-2">🏢</span> Website Integration
-                </h4>
-                <p class="text-sm text-blue-700 mb-3">Contact forms on your website automatically create companies in CRM</p>
-                <div class="bg-blue-100 p-3 rounded-md">
-                    <code class="text-xs text-blue-800 block">
-                        &lt;form action="/api/companies" method="POST"&gt;<br>
-                        &nbsp;&nbsp;&lt;input name="name" required&gt;<br>
-                        &nbsp;&nbsp;&lt;input name="email" required&gt;<br>
-                        &lt;/form&gt;
-                    </code>
-                </div>
-            </div>
-            
-            <div class="p-4 border border-green-200 rounded-lg bg-green-50">
-                <h4 class="font-semibold text-green-900 mb-2 flex items-center">
-                    <span class="mr-2">📱</span> Mobile App
-                </h4>
-                <p class="text-sm text-green-700 mb-3">Sales reps use mobile app to access same data</p>
-                <div class="bg-green-100 p-3 rounded-md">
-                    <code class="text-xs text-green-800 block">
-                        fetch('/api/companies')<br>
-                        &nbsp;&nbsp;.then(res => res.json())<br>
-                        &nbsp;&nbsp;.then(data => display(data))
-                    </code>
-                </div>
-            </div>
-            
-            <div class="p-4 border border-purple-200 rounded-lg bg-purple-50">
-                <h4 class="font-semibold text-purple-900 mb-2 flex items-center">
-                    <span class="mr-2">🔗</span> Third-party Tools
-                </h4>
-                <p class="text-sm text-purple-700 mb-3">Zapier, Make.com, or custom integrations</p>
-                <div class="bg-purple-100 p-3 rounded-md">
-                    <code class="text-xs text-purple-800 block">
-                        headers: {<br>
-                        &nbsp;&nbsp;'Authorization': 'Bearer token',<br>
-                        &nbsp;&nbsp;'Content-Type': 'application/json'<br>
-                        }
-                    </code>
-                </div>
-            </div>
-        </div>
-
-        <!-- API Features Showcase -->
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-indigo-200 rounded-lg">
-                <h4 class="font-semibold text-indigo-900 mb-2">🚀 Professional Features</h4>
-                <ul class="text-sm text-indigo-700 space-y-1">
-                    <li>• <strong>Pagination:</strong> Handle large datasets efficiently</li>
-                    <li>• <strong>Search & Filter:</strong> Find companies quickly</li>
-                    <li>• <strong>Sorting:</strong> Order results by any field</li>
-                    <li>• <strong>Error Handling:</strong> Robust error responses</li>
-                </ul>
-            </div>
-            
-            <div class="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-emerald-200 rounded-lg">
-                <h4 class="font-semibold text-emerald-900 mb-2">🔒 Enterprise Ready</h4>
-                <ul class="text-sm text-emerald-700 space-y-1">
-                    <li>• <strong>Authentication:</strong> Secure API access</li>
-                    <li>• <strong>Rate Limiting:</strong> Prevent API abuse</li>
-                    <li>• <strong>Validation:</strong> Data integrity guaranteed</li>
-                    <li>• <strong>Logging:</strong> Full audit trail</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <!-- Interactive Test Forms -->
-    
-    <!-- Search Form -->
-    <div id="searchForm" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6" style="display: none;">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <span class="mr-2">🔍</span> Test Advanced Search & Filtering
-        </h3>
-        <form onsubmit="searchCompanies(event)" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <input type="text" name="search" placeholder="Search by name, email, or industry" 
-                       class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                <select name="industry" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    <option value="">All Industries</option>
-                    <option value="Technology">Technology</option>
-                    <option value="Healthcare">Healthcare</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Education">Education</option>
-                    <option value="Manufacturing">Manufacturing</option>
-                </select>
-                <select name="sort_by" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    <option value="name">Sort by Name</option>
-                    <option value="created_at">Sort by Date</option>
-                    <option value="email">Sort by Email</option>
-                </select>
-            </div>
-            <div class="flex items-center gap-4">
-                <label class="flex items-center">
-                    <input type="radio" name="sort_order" value="asc" checked class="mr-2"> Ascending
-                </label>
-                <label class="flex items-center">
-                    <input type="radio" name="sort_order" value="desc" class="mr-2"> Descending
-                </label>
-                <input type="number" name="per_page" placeholder="Results per page (1-100)" min="1" max="100" 
-                       class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-            <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 cursor-pointer transition-colors flex items-center">
-                <span class="mr-2">🔍</span> Search via API
-            </button>
-        </form>
-    </div>
-
-    <!-- Pagination Form -->
-    <div id="paginationForm" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6" style="display: none;">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <span class="mr-2">📊</span> Test Pagination Controls
-        </h3>
-        <form onsubmit="testPagination(event)" class="flex gap-4 items-end">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Page Number</label>
-                <input type="number" name="page" placeholder="1" min="1" value="1"
-                       class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Items per Page</label>
-                <select name="per_page" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
-                    <option value="5">5 items</option>
-                    <option value="10" selected>10 items</option>
-                    <option value="25">25 items</option>
-                    <option value="50">50 items</option>
-                </select>
-            </div>
-            <button type="submit" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 cursor-pointer transition-colors flex items-center">
-                <span class="mr-2">📊</span> Test Pagination
-            </button>
-        </form>
-    </div>
-
-    <!-- Create Form -->
-    <div id="createForm" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6" style="display: none;">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <span class="mr-2">➕</span> Test POST /api/companies
-        </h3>
-        <form onsubmit="createCompanyViaAPI(event)" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Company Name *</label>
-                    <input type="text" name="name" placeholder="e.g., Tech Solutions Inc." required 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                    <input type="email" name="email" placeholder="e.g., contact@techsolutions.com" required 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
-                    <input type="text" name="phone" placeholder="e.g., +1-555-123-4567" required 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Industry</label>
-                    <select name="industry" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Select Industry</option>
-                        <option value="Technology">Technology</option>
-                        <option value="Healthcare">Healthcare</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Education">Education</option>
-                        <option value="Manufacturing">Manufacturing</option>
-                    </select>
-                </div>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                <input type="text" name="address" placeholder="e.g., 123 Business Ave, City, State 12345" 
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 cursor-pointer transition-colors flex items-center">
-                <span class="mr-2">➕</span> Create via API
-            </button>
-        </form>
-    </div>
-
-    <!-- Get Specific Company Form -->
-    <div id="getForm" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6" style="display: none;">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <span class="mr-2">🔎</span> Test GET /api/companies/{id}
-        </h3>
-        <form onsubmit="getCompanyViaAPI(event)" class="flex gap-4 items-end">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Company ID</label>
-                <input type="number" name="company_id" placeholder="e.g., 1" required min="1"
-                       class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
-            </div>
-            <button type="submit" class="bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700 cursor-pointer transition-colors flex items-center">
-                <span class="mr-2">🔎</span> Get via API
-            </button>
-        </form>
-        <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p class="text-yellow-700 text-sm">💡 Try IDs 1-10 to see existing companies, or use a non-existent ID to test error handling</p>
         </div>
     </div>
 </div>

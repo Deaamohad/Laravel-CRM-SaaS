@@ -7,6 +7,10 @@
 
     <title>@yield('title', 'Dashboard - Cliento')</title>
 
+    <!-- Favicon -->
+    <link rel="icon" href="{{ asset('images/Logo.svg') }}" type="image/svg+xml">
+
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -19,8 +23,15 @@
 </head>
 <body class="font-sans antialiased bg-gray-50">
     <div class="min-h-screen flex">
+        <!-- Mobile menu button -->
+        <button id="mobile-menu-button" class="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-lg shadow-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
         <!-- Sidebar -->
-        <div class="w-64 bg-white shadow-lg">
+        <div id="sidebar" class="w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out fixed md:relative z-40 h-full">
             <div class="flex items-center justify-center h-16 border-b border-gray-200">
                 <div class="flex items-center space-x-3">
                     <img src="{{ asset('images/Logo.svg') }}" alt="Logo" class="w-8 h-8">
@@ -78,25 +89,25 @@
         </div>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col">
+        <div class="flex-1 flex flex-col md:ml-0">
             <!-- Top Navigation -->
             <header class="bg-white shadow-sm border-b border-gray-200">
-                <div class="flex justify-between items-center px-6 py-4">
-                    <div>
-                        <h1 class="text-2xl font-semibold text-gray-900">@yield('page-title', 'Dashboard')</h1>
-                        <p class="text-sm text-gray-600">@yield('page-description', 'Welcome back!')</p>
+                <div class="flex justify-between items-center px-4 md:px-6 py-4">
+                    <div class="md:ml-0 ml-12">
+                        <h1 class="text-xl md:text-2xl font-semibold text-gray-900">@yield('page-title', 'Dashboard')</h1>
+                        <p class="text-sm text-gray-600 hidden md:block">@yield('page-description', 'Welcome back!')</p>
                     </div>
                     
                     <div class="flex items-center">
                         <div class="flex items-center space-x-4">
                             <!-- User Dropdown -->
                             <div class="relative">
-                            <button id="userMenuButton" class="flex items-center space-x-3 text-sm text-gray-700 hover:text-gray-900 focus:outline-none cursor-pointer rounded-lg px-3 py-2 hover:bg-gray-100 transition-colors">
-                                <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                            <button id="userMenuButton" class="flex items-center space-x-2 md:space-x-3 text-sm text-gray-700 hover:text-gray-900 focus:outline-none cursor-pointer rounded-lg px-2 md:px-3 py-2 hover:bg-gray-100 transition-colors">
+                                <div class="w-8 h-8 md:w-9 md:h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm md:text-base">
                                     {{ Auth::check() ? strtoupper(substr(Auth::user()->name, 0, 1)) : 'D' }}
                                 </div>
-                                <span class="font-medium">{{ Auth::check() ? Auth::user()->name : 'Developer' }}</span>
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <span class="font-medium hidden md:block">{{ Auth::check() ? Auth::user()->name : 'Developer' }}</span>
+                                <svg class="w-4 h-4 hidden md:block" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                 </svg>
                             </button>
@@ -133,7 +144,7 @@
             </header>
 
             <!-- Page Content -->
-            <main class="flex-1 p-6">
+            <main class="flex-1 p-4 md:p-6">
                 @if(session('success'))
                     <x-flash-message type="success" message="{{ session('success') }}" />
                 @endif
@@ -148,10 +159,24 @@
     </div>
     
     <script>
-        // User dropdown toggle
+        // User dropdown toggle and mobile menu
         document.addEventListener('DOMContentLoaded', function() {
             const userMenuButton = document.getElementById('userMenuButton');
             const userMenu = document.getElementById('userMenu');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const sidebar = document.getElementById('sidebar');
+            
+            // Mobile menu toggle
+            mobileMenuButton.addEventListener('click', function() {
+                sidebar.classList.toggle('-translate-x-full');
+            });
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!mobileMenuButton.contains(event.target) && !sidebar.contains(event.target)) {
+                    sidebar.classList.add('-translate-x-full');
+                }
+            });
             
             // Toggle dropdown when clicking the button
             userMenuButton.addEventListener('click', function() {
