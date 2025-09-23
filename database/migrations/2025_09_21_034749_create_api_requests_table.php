@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -15,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('method', 10); // GET, POST, PUT, DELETE, etc.
-            $table->string('endpoint', 500);
+            $table->string('endpoint', 191); // Reduced to 191 to avoid index length issues
             $table->string('full_url', 1000);
             $table->integer('status_code');
             $table->integer('response_time_ms');
@@ -31,12 +32,16 @@ return new class extends Migration
             $table->timestamp('requested_at');
             $table->timestamps();
             
-            // Indexes for performance
+                        // Indexes for performance - avoiding endpoint column due to key length issues
             $table->index(['user_id', 'requested_at']);
-            $table->index(['endpoint', 'requested_at']);
+            $table->index(['requested_at']);
             $table->index(['status_code', 'requested_at']);
             $table->index(['is_successful', 'requested_at']);
         });
+        
+        // We've removed the endpoint index to avoid key length issues
+        // If you need it later, you can add it manually with: 
+        // DB::statement('CREATE INDEX api_requests_endpoint_idx ON api_requests(endpoint(191));');
     }
 
     /**
