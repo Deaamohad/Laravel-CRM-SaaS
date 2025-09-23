@@ -38,100 +38,263 @@
         <!-- Trusted Companies -->
         <div class="text-center mb-16">
             <p class="text-gray-500 text-lg font-medium mb-8">Trusted by 10,000+ businesses worldwide</p>
-
+            
+            <!-- Clean Logo Carousel -->
             <div class="logos">
                 <div class="logos-slide">
-                    <img src="{{ asset('images/logos/logos (1).png') }}" alt="Partner 1">
-                    <img src="{{ asset('images/logos/logos (2).png') }}" alt="Partner 2">
-                    <img src="{{ asset('images/logos/logos (3).png') }}" alt="Partner 3">
-                    <img src="{{ asset('images/logos/logos (4).png') }}" alt="Partner 4">
-                    <img src="{{ asset('images/logos/logos (5).png') }}" alt="Partner 5">
-                    <img src="{{ asset('images/logos/logos (6).png') }}" alt="Partner 6">
-                    <img src="{{ asset('images/logos/logos (7).png') }}" alt="Partner 7">
-                    <img src="{{ asset('images/logos/logos (8).png') }}" alt="Partner 8">
-                    <img src="{{ asset('images/logos/logos (9).png') }}" alt="Partner 9">
-                    <img src="{{ asset('images/logos/logos (10).png') }}" alt="Partner 10">
-                    <img src="{{ asset('images/logos/logos (11).png') }}" alt="Partner 11">
+                    @for($i = 1; $i <= 12; $i++)
+                    <img src="{{ asset('images/logos/logos (' . $i . ').png', true) }}" alt="Partner {{ $i }}" />
+                    @endfor
                 </div>
-                <script>
-      var copy = document.querySelector(".logos-slide").cloneNode(true);
-      document.querySelector(".logos").appendChild(copy);
-    </script>
             </div>
             
+            <style>
+                @keyframes slide {
+                    from {
+                        transform: translateX(0);
+                    }
+                    to {
+                        transform: translateX(-100%);
+                    }
+                }
+
+                .logos {
+                    overflow: hidden;
+                    padding: 60px 0;
+                    background: white;
+                    white-space: nowrap;
+                    position: relative;
+                }
+
+                .logos:before,
+                .logos:after {
+                    position: absolute;
+                    top: 0;
+                    width: 250px;
+                    height: 100%;
+                    content: "";
+                    z-index: 2;
+                }
+
+                .logos:before {
+                    left: 0;
+                    background: linear-gradient(to left, rgba(255, 255, 255, 0), white);
+                }
+
+                .logos:after {
+                    right: 0;
+                    background: linear-gradient(to right, rgba(255, 255, 255, 0), white);
+                }
+
+                .logos:hover .logos-slide {
+                    animation-play-state: paused;
+                }
+
+                .logos-slide {
+                    display: inline-block;
+                    animation: 35s slide infinite linear;
+                }
+
+                .logos-slide img {
+                    height: 50px;
+                    margin: 0 40px;
+                }
+
+                @media (max-width: 640px) {
+                    .logos-slide img {
+                        height: 30px;
+                        margin: 0 20px;
+                    }
+                }
+            </style>
+            
+            <script>
+                // Clone the logos for seamless loop
+                var copy = document.querySelector(".logos-slide").cloneNode(true);
+                document.querySelector(".logos").appendChild(copy);
+            </script>
+        </div>
+                        
+                        // Clear any existing clones first
+                        const existingClones = marqueeContainer.querySelectorAll('.logo-track:not(#logo-track-primary)');
+                        existingClones.forEach(clone => clone.remove());
+                        
+                        // Reset animation and position on primary track
+                        track.style.animation = 'none';
+                        track.style.position = 'absolute';
+                        track.style.left = '0';
+                        track.style.transform = 'translateX(0)';
+                        
+                        // Get the accurate width after images have loaded
+                        const trackWidth = track.offsetWidth;
+                        const containerWidth = marqueeContainer.offsetWidth;
+                        
+                        // Set the container height to match the track
+                        marqueeContainer.style.height = track.offsetHeight + 'px';
+                        
+                        // Calculate how many clones we need to fill viewport plus buffer
+                        // We want at least 3 complete sets to ensure no visual gaps
+                        const numberOfClones = Math.max(3, Math.ceil((containerWidth * 3) / trackWidth));
+                        
+                        // Create multiple clones for a more robust infinite scroll
+                        for (let i = 0; i < numberOfClones; i++) {
+                            const clone = track.cloneNode(true);
+                            clone.id = `logo-track-clone-${i}`;
+                            clone.classList.add('logo-track-clone');
+                            clone.style.position = 'absolute';
+                            clone.style.left = '0'; // All tracks start at left 0
+                            clone.style.transform = `translateX(${trackWidth * (i + 1)}px)`; // Positioned with transform instead
+                            marqueeContainer.appendChild(clone);
+                        }
+                        
+                        // Calculate a good duration - slower for better readability
+                        // The entire carousel should take about 30-40 seconds for one loop
+                        const totalWidth = trackWidth * (numberOfClones + 1);
+                        const duration = totalWidth / 50; // pixels per second
+                        
+                        // Create a smooth continuous scroll with CSS transforms instead of left position
+                        // This eliminates any flickering during repositioning
+                        let scrollPosition = 0;
+                        const scrollSpeed = 0.8; // pixels per frame - adjust for desired speed
+                        
+                        // Set up the continuous scroll animation
+                        function animateScroll() {
+                            // Increment scroll position
+                            scrollPosition += scrollSpeed;
+                            
+                            // If we've scrolled a complete track width, reset to avoid floating point issues
+                            if (scrollPosition >= trackWidth) {
+                                scrollPosition = 0;
+                            }
+                            
+                            // Get all tracks
+                            const allTracks = marqueeContainer.querySelectorAll('.logo-track');
+                            
+                            // Apply the transform to all tracks with an offset
+                            allTracks.forEach((trackElement, index) => {
+                                const basePosition = index * trackWidth; // Each track starts after the previous one
+                                const transformX = -scrollPosition + basePosition;
+                                trackElement.style.transform = `translateX(${transformX}px)`;
+                                
+                                // Check if this track has moved completely off-screen to the left
+                                if (transformX < -trackWidth) {
+                                    // Instead of abrupt reposition, just shift it by the total width of all tracks
+                                    // This creates a seamless loop
+                                    const totalTracksWidth = trackWidth * allTracks.length;
+                                    trackElement.style.transform = `translateX(${transformX + totalTracksWidth}px)`;
+                                }
+                            });
+                            
+                            // Continue the animation
+                            animationId = requestAnimationFrame(animateScroll);
+                        }
+                        
+                        // Start the animation
+                        let animationId = requestAnimationFrame(animateScroll);
+                        
+                        // Pause animations on hover
+                        marqueeContainer.addEventListener('mouseenter', () => {
+                            cancelAnimationFrame(animationId);
+                        });
+                        
+                        marqueeContainer.addEventListener('mouseleave', () => {
+                            animationId = requestAnimationFrame(animateScroll);
+                        });
+                        
+                        // Store the animation ID for cleanup
+                        marqueeContainer.dataset.animationId = animationId;
+                    }
+                    
+                    // Wait for images to load before setting up
+                    const images = document.querySelectorAll('#logo-track-primary img');
+                    
+                    // Debug information
+                    console.log(`Logo carousel: Found ${images.length} logo images`);
+                    if (images.length > 0) {
+                        images.forEach((img, index) => {
+                            console.log(`Logo ${index + 1} src: ${img.src}, complete: ${img.complete}`);
+                        });
+                    }
+                    
+                    if (images.length > 0) {
+                        let loadedCount = 0;
+                        let errorCount = 0;
+                        
+                        images.forEach((img, index) => {
+                            if (img.complete && img.naturalWidth !== 0) {
+                                console.log(`Logo ${index + 1} already loaded`);
+                                loadedCount++;
+                                if (loadedCount + errorCount === images.length) {
+                                    console.log('All logos processed, setting up marquee');
+                                    setupImprovedMarquee();
+                                }
+                            } else {
+                                img.addEventListener('load', () => {
+                                    console.log(`Logo ${index + 1} loaded successfully`);
+                                    loadedCount++;
+                                    if (loadedCount + errorCount === images.length) {
+                                        console.log('All logos processed, setting up marquee');
+                                        setupImprovedMarquee();
+                                    }
+                                });
+                                img.addEventListener('error', () => {
+                                    console.error(`Error loading logo ${index + 1}: ${img.src}`);
+                                    errorCount++;
+                                    // Try to reload with a corrected path if there's an issue
+                                    if (img.src.includes('http://') || img.src.includes('https://')) {
+                                        // Already has protocol, don't try to fix
+                                    } else {
+                                        // Try without asset helper in case there's an issue with the path
+                                        img.src = `/images/logos/logos (${index + 1}).png`;
+                                    }
+                                    
+                                    if (loadedCount + errorCount === images.length) {
+                                        console.log('All logos processed (with some errors), setting up marquee');
+                                        setupImprovedMarquee();
+                                    }
+                                });
+                            }
+                        });
+                        
+                        // Fallback in case images don't load
+                        setTimeout(() => {
+                            console.log('Fallback timeout reached, setting up marquee');
+                            setupImprovedMarquee();
+                        }, 2000);
+                    } else {
+                        // No images, set up immediately
+                        console.warn('No logo images found, setting up empty marquee');
+                        setupImprovedMarquee();
+                    }
+                    
+                    // Handle window resize for responsiveness
+                    let resizeTimeout;
+                    window.addEventListener('resize', () => {
+                        // Debounce resize event
+                        clearTimeout(resizeTimeout);
+                        resizeTimeout = setTimeout(() => {
+                            // Clean up existing animation
+                            const marqueeContainer = document.getElementById('logo-marquee');
+                            if (marqueeContainer && marqueeContainer.dataset.animationId) {
+                                cancelAnimationFrame(parseInt(marqueeContainer.dataset.animationId));
+                            }
+                            
+                            // Rebuild the marquee
+                            setupImprovedMarquee();
+                        }, 250);
+                    });
+                    
+                    // Clean up when navigating away
+                    window.addEventListener('beforeunload', () => {
+                        const marqueeContainer = document.getElementById('logo-marquee');
+                        if (marqueeContainer && marqueeContainer.dataset.animationId) {
+                            cancelAnimationFrame(parseInt(marqueeContainer.dataset.animationId));
+                        }
+                    });
+                });
+            </script>
         </div>
         
-        <style>
-
-            @keyframes slide {
-                from {
-                    transform: translateX(0);
-                }
-                to {
-                    transform: translateX(-100%);
-                }
-            }
-
-
-            .logos {
-                overflow: hidden;
-                padding: 40px 0;
-                white-space: nowrap;
-                position: relative;
-            }
-
-             .logos:before {
-                 position: absolute;
-                 top: 0;
-                 left: 0;
-                 width: 200px;
-                 height: 100%;
-                 content: "";
-                 z-index: 2;
-                 background: linear-gradient(to left, rgba(255, 255, 255, 0), white);
-             }
-
-             .logos:after {
-                 position: absolute;
-                 top: 0;
-                 right: 0;
-                 width: 200px;
-                 height: 100%;
-                 content: "";
-                 z-index: 2;
-                 background: linear-gradient(to right, rgba(255, 255, 255, 0), white);
-             }
-
-             .logos-slide {
-                 display: inline-flex;
-                 align-items: center;
-                 animation: 30s slide infinite linear;
-                 white-space: nowrap;
-                 width: max-content;
-             }
-
-             .logos:hover .logos-slide {
-                animation-play-state: paused;
-             }
-
-             .logos-slide img{
-                 height: 150px;
-                 width: auto;
-                 margin: 0 40px;
-                 flex-shrink: 0;
-                 display: block;
-                 object-fit: contain;
-             }
-
-              .logos-slide img {
-                 transition: transform 0.2s ease-in-out;
-              }
-
-              .logos-slide img:hover {
-                 transform: scale(1.10);
-              }
-
-        </style>
 
         <!-- Stats Grid -->
         <div class="grid md:grid-cols-4 gap-8 mb-20" id="stats-section">
