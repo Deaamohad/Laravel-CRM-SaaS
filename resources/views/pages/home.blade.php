@@ -11,7 +11,7 @@
                 
                 <h1 class="text-5xl lg:text-6xl font-black tracking-tight text-gray-900 mb-6 leading-tight">
                     Transform Your 
-                    <span class="text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">Business</span> 
+                    <span class="gradient-text-blue-purple">Business</span> 
                     with Smart CRM
                 </h1>
                 

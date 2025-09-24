@@ -83,7 +83,7 @@
         
         <h1 class="text-5xl lg:text-7xl font-black tracking-tight leading-tight text-white mb-8">
             Powerful.<br>
-            <span class="text-transparent bg-gradient-to-r from-cyan-300 via-blue-200 to-purple-300 bg-clip-text">Affordable</span>.<br>
+            <span class="gradient-text-cyan-blue-purple">Affordable</span>.<br>
             <span class="text-4xl lg:text-6xl">Easy to use.</span>
         </h1>
         

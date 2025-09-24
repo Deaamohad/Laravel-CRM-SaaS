@@ -1,5 +1,68 @@
 @import 'tailwindcss';
 
+/* Completely disable Tailwind's dark mode system */
+* {
+  color-scheme: light !important;
+}
+
+/* Override any dark mode styles that might be applied */
+@media (prefers-color-scheme: dark) {
+  * {
+    color-scheme: light !important;
+  }
+}
+
+/* Enhanced gradient text with vendor prefixes */
+.gradient-text {
+  background: linear-gradient(to right, #2563eb, #9333ea);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  display: inline-block;
+}
+
+.gradient-text-blue-purple {
+  background: linear-gradient(to right, #2563eb, #9333ea);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  display: inline-block;
+}
+
+.gradient-text-blue-cyan {
+  background: linear-gradient(to right, #3b82f6, #06b6d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  display: inline-block;
+}
+
+.gradient-text-cyan-blue-purple {
+  background: linear-gradient(to right, #67e8f9, #dbeafe, #c084fc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  display: inline-block;
+}
+
+/* Browser compatibility fallbacks */
+@supports not (background-clip: text) {
+  .gradient-text,
+  .gradient-text-blue-purple,
+  .gradient-text-blue-cyan,
+  .gradient-text-cyan-blue-purple {
+    color: #2563eb !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: unset !important;
+  }
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
@@ -176,7 +239,19 @@
     }
     
     .pricing-card-feature-icon-enhanced {
-        @apply w-6 h-6 text-emerald-500 mr-4 flex-shrink-0;
+        @apply w-5 h-5 text-emerald-500 mr-3 flex-shrink-0;
+        width: 1.25rem !important;
+        height: 1.25rem !important;
+        max-width: 1.25rem !important;
+        max-height: 1.25rem !important;
+    }
+    
+    /* Force SVG sizing in pricing cards */
+    .pricing-card-feature-enhanced svg {
+        width: 1.25rem !important;
+        height: 1.25rem !important;
+        max-width: 1.25rem !important;
+        max-height: 1.25rem !important;
     }
 }
 

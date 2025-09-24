@@ -14,17 +14,128 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
+    <!-- CDN Fallbacks for production and local testing -->
+    @if(app()->environment('production') || true)
+        <!-- Tailwind CSS CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <!-- Alpine.js CDN -->
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        
+        <!-- Force light mode even with CDN Tailwind -->
+        <style>
+            * { color-scheme: light !important; }
+            @media (prefers-color-scheme: dark) {
+                * { color-scheme: light !important; }
+            }
+            
+            /* Fix giant check icons in pricing cards */
+            .pricing-card-feature-icon-enhanced {
+                width: 1.25rem !important;
+                height: 1.25rem !important;
+                max-width: 1.25rem !important;
+                max-height: 1.25rem !important;
+            }
+            
+            .pricing-card-feature-enhanced svg {
+                width: 1.25rem !important;
+                height: 1.25rem !important;
+                max-width: 1.25rem !important;
+                max-height: 1.25rem !important;
+            }
+            
+            /* Enhanced gradient text with vendor prefixes */
+            .gradient-text-blue-purple {
+                background: linear-gradient(to right, #2563eb, #9333ea);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                color: transparent;
+                display: inline-block;
+            }
+            
+            .gradient-text-blue-cyan {
+                background: linear-gradient(to right, #3b82f6, #06b6d4);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                color: transparent;
+                display: inline-block;
+            }
+            
+            .gradient-text-cyan-blue-purple {
+                background: linear-gradient(to right, #67e8f9, #dbeafe, #c084fc);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                color: transparent;
+                display: inline-block;
+            }
+            
+            /* Mobile pricing cards - stack vertically on small screens */
+            @media (max-width: 768px) {
+                .grid.lg\\:grid-cols-3 {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 1rem !important;
+                }
+                
+                .pricing-card-enhanced {
+                    width: 100% !important;
+                    margin: 0 !important;
+                    transform: none !important;
+                    border: 1px solid #e5e7eb !important;
+                    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+                }
+                
+                .pricing-card-featured-enhanced {
+                    transform: none !important;
+                    scale: 1 !important;
+                    border: 2px solid #3b82f6 !important;
+                }
+                
+                /* Ensure cards have proper styling */
+                .pricing-card-enhanced,
+                .pricing-card-featured-enhanced {
+                    background: white !important;
+                    border-radius: 0.5rem !important;
+                    padding: 2rem !important;
+                }
+            }
+            
+            /* Mobile navigation improvements */
+            #mobileOverlay {
+                background: rgba(0, 0, 0, 0.1) !important;
+                backdrop-filter: blur(2px);
+            }
+            
+            #sidebar {
+                background: white !important;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1) !important;
+            }
+        </style>
+    @endif
+    
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
-<body class="font-sans antialiased bg-gray-50">
+<body class="font-sans antialiased bg-gray-50" style="color-scheme: light;">
     <div class="min-h-screen flex">
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuButton" class="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-md shadow-lg border border-gray-200">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
+        <!-- Mobile Overlay -->
+        <div id="mobileOverlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-20 z-40 hidden"></div>
+
         <!-- Sidebar -->
-        <div class="w-64 bg-white shadow-lg">
+        <div id="sidebar" class="w-64 bg-white shadow-lg lg:translate-x-0 -translate-x-full transition-transform duration-300 ease-in-out fixed lg:static z-50 h-full">
             <div class="flex items-center justify-center h-16 border-b border-gray-200">
                 <div class="flex items-center space-x-3">
                     <img src="{{ asset('images/Logo.svg') }}" alt="Logo" class="w-8 h-8">
-                    <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent select-none pointer-events-none">
+                    <h1 class="text-xl font-bold text-black select-none pointer-events-none">
                         Cliento
                     </h1>
                 </div>
@@ -78,7 +189,7 @@
         </div>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col">
+        <div class="flex-1 flex flex-col lg:ml-0 ml-0">
             <!-- Top Navigation -->
             <header class="bg-white shadow-sm border-b border-gray-200">
                 <div class="flex justify-between items-center px-6 py-4">
@@ -172,6 +283,23 @@
                 if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
                     userMenu.classList.add('hidden');
                 }
+            });
+        });
+
+        // Mobile Menu Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const sidebar = document.getElementById('sidebar');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                sidebar.classList.toggle('-translate-x-full');
+                mobileOverlay.classList.toggle('hidden');
+            });
+            
+            mobileOverlay.addEventListener('click', function() {
+                sidebar.classList.add('-translate-x-full');
+                mobileOverlay.classList.add('hidden');
             });
         });
     </script>

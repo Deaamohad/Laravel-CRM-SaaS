@@ -90,7 +90,7 @@
         
         <!-- Main Title -->
         <h1 class="text-6xl lg:text-7xl font-black tracking-tight leading-none text-white mb-8">
-            Empowering <span class="text-transparent bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text">Businesses</span><br>
+            Empowering <span class="gradient-text-blue-purple">Businesses</span><br>
             Around the World
         </h1>
         

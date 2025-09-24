@@ -9,7 +9,7 @@
             <div>
                 <h1 class="contact-mega-title text-white mb-8 leading-tight">
                     Get in<br>
-                    <span class="text-transparent bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text">Touch</span>
+                    <span class="gradient-text-blue-cyan">Touch</span>
                 </h1>
                 <p class="text-2xl text-gray-300 mb-8 max-w-lg font-light leading-relaxed">
                     Have questions about our CRM solution? We're here to help you succeed and grow your business.

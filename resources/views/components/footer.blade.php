@@ -4,7 +4,7 @@
             <div class="col-span-1">
                 <div class="flex items-center space-x-3 mb-6">
                     <img src="{{ asset('images/Logo.svg') }}" alt="Logo" class="w-10 h-10">
-                    <h3 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent select-none pointer-events-none">
+                    <h3 class="text-xl font-bold gradient-text-blue-purple select-none pointer-events-none">
                         Cliento
                     </h3>
                 </div>
