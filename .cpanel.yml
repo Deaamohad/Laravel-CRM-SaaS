@@ -1,0 +1,71 @@
+---
+# Laravel CRM SaaS Deployment Configuration
+# This file handles automatic deployment to cPanel hosting
+deployment:
+  tasks:
+    # Set deployment path (replace 'yourusername' with your actual cPanel username)
+    - export DEPLOYPATH=/home/yourusername/public_html/
+    
+    # Create necessary directories if they don't exist
+    - mkdir -p $DEPLOYPATH
+    - mkdir -p $DEPLOYPATH/storage/app
+    - mkdir -p $DEPLOYPATH/storage/framework/cache
+    - mkdir -p $DEPLOYPATH/storage/framework/sessions
+    - mkdir -p $DEPLOYPATH/storage/framework/views
+    - mkdir -p $DEPLOYPATH/storage/logs
+    - mkdir -p $DEPLOYPATH/bootstrap/cache
+    
+    # Copy Laravel application files
+    - /bin/cp -R app $DEPLOYPATH/
+    - /bin/cp -R bootstrap $DEPLOYPATH/
+    - /bin/cp -R config $DEPLOYPATH/
+    - /bin/cp -R database $DEPLOYPATH/
+    - /bin/cp -R resources $DEPLOYPATH/
+    - /bin/cp -R routes $DEPLOYPATH/
+    - /bin/cp -R storage $DEPLOYPATH/
+    - /bin/cp -R vendor $DEPLOYPATH/
+    
+    # Copy essential files
+    - /bin/cp artisan $DEPLOYPATH/
+    - /bin/cp composer.json $DEPLOYPATH/
+    - /bin/cp composer.lock $DEPLOYPATH/
+    - /bin/cp package.json $DEPLOYPATH/
+    - /bin/cp package-lock.json $DEPLOYPATH/
+    - /bin/cp tailwind.config.js $DEPLOYPATH/
+    - /bin/cp vite.config.js $DEPLOYPATH/
+    - /bin/cp phpunit.xml $DEPLOYPATH/
+    
+    # Copy public directory contents to public_html
+    - /bin/cp -R public/* $DEPLOYPATH/
+    
+    # Set proper permissions for Laravel
+    - chmod -R 755 $DEPLOYPATH/storage
+    - chmod -R 755 $DEPLOYPATH/bootstrap/cache
+    
+    # Copy environment file (make sure to create .env on your server first)
+    - /bin/cp .env.example $DEPLOYPATH/.env
+    
+    # Run Laravel optimization commands
+    - cd $DEPLOYPATH && php artisan config:cache
+    - cd $DEPLOYPATH && php artisan route:cache
+    - cd $DEPLOYPATH && php artisan view:cache
+    
+    # Install/update Composer dependencies
+    - cd $DEPLOYPATH && composer install --no-dev --optimize-autoloader
+    
+    # Install/update NPM dependencies and build assets
+    - cd $DEPLOYPATH && npm install
+    - cd $DEPLOYPATH && npm run build
+    
+    # Generate application key if needed
+    - cd $DEPLOYPATH && php artisan key:generate --force
+    
+    # Run database migrations (uncomment if needed)
+    # - cd $DEPLOYPATH && php artisan migrate --force
+    
+    # Clear all caches
+    - cd $DEPLOYPATH && php artisan cache:clear
+    - cd $DEPLOYPATH && php artisan config:clear
+    - cd $DEPLOYPATH && php artisan route:clear
+    - cd $DEPLOYPATH && php artisan view:clear
+
