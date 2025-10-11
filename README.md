@@ -85,10 +85,6 @@ This is a complete CRM (Customer Relationship Management) SaaS application that 
 
 The application will be available at `http://localhost:8000`
 
-## 📱 Screenshots
-
-*[Add screenshots of your dashboard, company management, and deal tracking pages here]*
-
 ## 🔧 API Documentation
 
 The application includes a comprehensive REST API:
